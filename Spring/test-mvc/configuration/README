@@ -1,1 +1,5 @@
 This is an example application of my unpublished blog entry that talks about the configuration of spring-test-mvc.
+This application is still under development and it is missing following features:
+
+- Support for using ApplicationContextAnnotation on methods.
+
