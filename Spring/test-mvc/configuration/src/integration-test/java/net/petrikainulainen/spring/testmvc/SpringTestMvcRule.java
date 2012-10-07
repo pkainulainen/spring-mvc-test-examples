@@ -15,21 +15,32 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Petri Kainulainen
  */
-public class ApplicationContextRule implements TestRule {
+public class SpringTestMvcRule implements TestRule {
 
     private static final Map<String, MockMvc> mockMvcCache = new ConcurrentHashMap<String, MockMvc>();
 
     Object test;
 
-    public ApplicationContextRule(Object test) {
+    public SpringTestMvcRule(Object test) {
         this.test = test;
     }
 
     @Override
     public Statement apply(Statement base, Description description) {
-        ApplicationContextSetup contextConfiguration = description.getTestClass().getAnnotation(ApplicationContextSetup.class);
-        if (contextConfiguration != null) {
-            MockMvc mockMvc = configureMockMvc(contextConfiguration);
+        ApplicationContextSetup contextConfigurationOnClass = description.getTestClass().getAnnotation(ApplicationContextSetup.class);
+        ApplicationContextSetup contextConfigurationOnMethod = description.getAnnotation(ApplicationContextSetup.class);
+
+        MockMvc mockMvc = null;
+        if (contextConfigurationOnMethod != null) {
+            mockMvc = configureMockMvc(contextConfigurationOnMethod);
+        }
+        else {
+            if (contextConfigurationOnClass != null) {
+                mockMvc = configureMockMvc(contextConfigurationOnClass);
+            }
+        }
+
+        if (mockMvc != null) {
             injectMockMvcToTestClass(description.getTestClass(), mockMvc);
         }
 
@@ -83,16 +94,13 @@ public class ApplicationContextRule implements TestRule {
 
     private void injectMockMvcToTestClass(Class testClass, MockMvc mockMvc) {
         Field[] fields = testClass.getDeclaredFields();
-        for (Field field: fields) {
-            if (field.getType().equals(MockMvc.class)) {
+        for (Field currentField: fields) {
+            if (currentField.getType().equals(MockMvc.class)) {
                 try {
-                    field.setAccessible(true);
-                    Object currentMockMvc = field.get(test);
-                    if (currentMockMvc == null) {
-                        field.set(test, mockMvc);
-                    }
+                    currentField.setAccessible(true);
+                    currentField.set(test, mockMvc);
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException("The MockMvc object could not be injected to field: " + field.getName());
+                    throw new RuntimeException("The MockMvc object could not be injected to field: " + currentField.getName());
                 }
                 break;
             }

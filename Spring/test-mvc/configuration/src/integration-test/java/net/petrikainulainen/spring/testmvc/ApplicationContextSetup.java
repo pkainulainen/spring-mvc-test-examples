@@ -10,13 +10,14 @@ import java.lang.annotation.Target;
  * the application context configuration class or configuration file that is
  * used to create new <code>MockMvc</code> objects.</p>
  *
- * <p>This annotation is given at the class level and all tests of that test class
- * are run by using the provided application context configuration.</p>
+ * <p>This annotation can be given at class or method level. If this annotation
+ * is used in both at class and method level, the configuration given in the method
+ * level annotation is used.</p>
  *
  * @author Petri Kainulainen
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.METHOD})
 public @interface ApplicationContextSetup {
 
     /**

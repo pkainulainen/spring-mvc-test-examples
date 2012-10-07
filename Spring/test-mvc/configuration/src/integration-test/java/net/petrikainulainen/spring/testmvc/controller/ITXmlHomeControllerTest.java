@@ -1,6 +1,6 @@
 package net.petrikainulainen.spring.testmvc.controller;
 
-import net.petrikainulainen.spring.testmvc.ApplicationContextRule;
+import net.petrikainulainen.spring.testmvc.SpringTestMvcRule;
 import net.petrikainulainen.spring.testmvc.ApplicationContextSetup;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,12 +18,20 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.v
 public class ITXmlHomeControllerTest {
 
     @Rule
-    public ApplicationContextRule rule = new ApplicationContextRule(this);
+    public SpringTestMvcRule rule = new SpringTestMvcRule(this);
 
     private MockMvc mockMvc;
 
     @Test
-    public void showHomePage() throws Exception {
+    public void showHomePageWhenClassLevelConfigurationIsUsed() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name(HomeController.VIEW_HOME_PAGE));
+    }
+
+    @Test
+    @ApplicationContextSetup(configurationFile = "classpath:exampleApplicationContext.xml")
+    public void showHomePageWhenMethodLevelConfigurationIsUsed() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(view().name(HomeController.VIEW_HOME_PAGE));
