@@ -12,7 +12,31 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * <p>This rule is used to create <code>MockMvc</code> objects and inject the created object to the executed
+ * test class. The created <code>MockMvc</code> objects are cached to ensure that each application context
+ * configuration is loaded only once.</p>
+ * <p>In order to use this class in your test, you must fulfill the following conditions:</p>
+ * <ol>
+ *     <li>You must provide the application context configuration by using the <code>ApplicationContextSetup</code> annotation.</li>
+ *     <li>Your test class must have field which type is <code>MockMvc</code> in your test class. The <code>MockMvc</code> object is injected in this field.</li>
+       <li>You must provide a reference to your test object as a constructor parameter.</li>
+ * </ol>
+ * <p>Example:</p>
+ * <pre>
+ * &#064;ApplicationContextSetup(configurationClass=AppContext.class)
+ * public class ITTest {
  *
+ *     &#064;Rule
+ *     public SpringTestMvcRule rule = new SpringTestMvcRule(this);
+ *
+ *     private MockMvc mockMvc;
+ *
+ *     &#064;Test
+ *     public void testSomething() {
+ *         //Use MockMvc object to write an integration test.
+ *     }
+ * }
+ * </pre>
  * @author Petri Kainulainen
  */
 public class SpringTestMvcRule implements TestRule {
