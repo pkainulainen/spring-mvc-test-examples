@@ -7,7 +7,6 @@ import org.springframework.test.web.server.MockMvc;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>In order to use this class in your test, you must fulfill the following conditions:</p>
  * <ol>
  *     <li>You must provide the application context configuration by using the <code>ApplicationContextSetup</code> annotation.</li>
- *     <li>Your test class must have field which type is <code>MockMvc</code> in your test class. The <code>MockMvc</code> object is injected in this field.</li>
+ *     <li>Your test class must have field which type is <code>MockMvc</code>. The <code>MockMvc</code> object is injected in this field.</li>
        <li>You must provide a reference to your test object as a constructor parameter.</li>
  * </ol>
  * <p>Example:</p>
@@ -43,7 +42,7 @@ public class SpringTestMvcRule implements TestRule {
 
     private static final Map<String, MockMvc> mockMvcCache = new ConcurrentHashMap<String, MockMvc>();
 
-    Object test;
+    private Object test;
 
     public SpringTestMvcRule(Object test) {
         this.test = test;
