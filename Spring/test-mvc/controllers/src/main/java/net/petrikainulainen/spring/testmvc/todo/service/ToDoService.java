@@ -1,22 +1,22 @@
 package net.petrikainulainen.spring.testmvc.todo.service;
 
-import net.petrikainulainen.spring.testmvc.todo.dto.ToDoDTO;
+import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
 import net.petrikainulainen.spring.testmvc.todo.exception.ToDoNotFoundException;
-import net.petrikainulainen.spring.testmvc.todo.model.ToDo;
+import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 
 import java.util.List;
 
 /**
  * @author Petri Kainulainen
  */
-public interface ToDoService {
+public interface TodoService {
 
     /**
      * Adds a new to-do entry.
      * @param added The information of the added to-do entry.
      * @return  The added to-do entry.
      */
-    public ToDo add(ToDoDTO added);
+    public Todo add(TodoDTO added);
 
     /**
      * Deletes a to-do entry.
@@ -24,13 +24,13 @@ public interface ToDoService {
      * @return  The deleted to-do entry.
      * @throws ToDoNotFoundException    if no to-do entry is found with the given id.
      */
-    public ToDo deleteById(Long id) throws ToDoNotFoundException;
+    public Todo deleteById(Long id) throws ToDoNotFoundException;
 
     /**
      * Returns a list of to-do entries.
      * @return
      */
-    public List<ToDo> findAll();
+    public List<Todo> findAll();
 
     /**
      * Finds a to-do entry.
@@ -38,7 +38,7 @@ public interface ToDoService {
      * @return  The found to-entry.
      * @throws ToDoNotFoundException    if no to-do entry is found with the given id.
      */
-    public ToDo findById(Long id) throws ToDoNotFoundException;
+    public Todo findById(Long id) throws ToDoNotFoundException;
 
     /**
      * Updates the information of a to-do entry.
@@ -46,5 +46,5 @@ public interface ToDoService {
      * @return  The updated to-do entry.
      * @throws ToDoNotFoundException    If no to-do entry is found with the given id.
      */
-    public ToDo update(ToDoDTO updated) throws ToDoNotFoundException;
+    public Todo update(TodoDTO updated) throws ToDoNotFoundException;
 }

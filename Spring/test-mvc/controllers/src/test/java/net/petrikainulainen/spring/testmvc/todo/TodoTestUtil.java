@@ -1,13 +1,13 @@
 package net.petrikainulainen.spring.testmvc.todo;
 
-import net.petrikainulainen.spring.testmvc.todo.dto.ToDoDTO;
-import net.petrikainulainen.spring.testmvc.todo.model.ToDo;
+import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
+import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Petri Kainulainen
  */
-public class ToDoTestUtil {
+public class TodoTestUtil {
 
     public static final Long ID = 1L;
     public static final String DESCRIPTION = "description";
@@ -17,8 +17,8 @@ public class ToDoTestUtil {
 
     private static final String CHARACTER = "a";
 
-    public static ToDoDTO createDTO(Long id, String description, String title) {
-        ToDoDTO dto = new ToDoDTO();
+    public static TodoDTO createDTO(Long id, String description, String title) {
+        TodoDTO dto = new TodoDTO();
 
         dto.setId(id);
         dto.setDescription(description);
@@ -27,8 +27,8 @@ public class ToDoTestUtil {
         return dto;
     }
 
-    public static ToDo createModel(Long id, String description, String title) {
-        ToDo model = ToDo.getBuilder(title)
+    public static Todo createModel(Long id, String description, String title) {
+        Todo model = Todo.getBuilder(title)
                 .description(description)
                 .build();
 

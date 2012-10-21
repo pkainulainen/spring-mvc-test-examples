@@ -1,10 +1,10 @@
 package net.petrikainulainen.spring.testmvc.todo.repository;
 
-import net.petrikainulainen.spring.testmvc.todo.model.ToDo;
+import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author Petri Kainulainen
  */
-public interface ToDoRepository extends JpaRepository<ToDo, Long> {
+public interface TodoRepository extends JpaRepository<Todo, Long> {
 }

@@ -7,14 +7,14 @@ import static junit.framework.Assert.*;
 /**
  * @author Petri Kainulainen
  */
-public class ToDoTest {
+public class TodoTest {
 
     private String TITLE = "title";
     private String DESCRIPTION = "description";
 
     @Test
     public void buildWithMandatoryInformation() {
-        ToDo built = ToDo.getBuilder(TITLE).build();
+        Todo built = Todo.getBuilder(TITLE).build();
 
         assertNull(built.getId());
         assertNull(built.getCreationTime());
@@ -26,7 +26,7 @@ public class ToDoTest {
 
     @Test
     public void buildWithAllInformation() {
-        ToDo built = ToDo.getBuilder(TITLE)
+        Todo built = Todo.getBuilder(TITLE)
                 .description(DESCRIPTION)
                 .build();
 
@@ -40,7 +40,7 @@ public class ToDoTest {
 
     @Test
     public void prePersist() {
-        ToDo todo = new ToDo();
+        Todo todo = new Todo();
         todo.prePersist();
 
         assertNull(todo.getId());
@@ -54,7 +54,7 @@ public class ToDoTest {
 
     @Test
     public void preUpdate() {
-        ToDo todo = new ToDo();
+        Todo todo = new Todo();
         todo.prePersist();
 
         pause(1000);

@@ -1,9 +1,9 @@
 package net.petrikainulainen.spring.testmvc.todo.controller;
 
-import net.petrikainulainen.spring.testmvc.todo.dto.ToDoDTO;
+import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
 import net.petrikainulainen.spring.testmvc.todo.exception.ToDoNotFoundException;
-import net.petrikainulainen.spring.testmvc.todo.model.ToDo;
-import net.petrikainulainen.spring.testmvc.todo.service.ToDoService;
+import net.petrikainulainen.spring.testmvc.todo.model.Todo;
+import net.petrikainulainen.spring.testmvc.todo.service.TodoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -24,9 +24,9 @@ import java.util.Locale;
  */
 @Controller
 @SessionAttributes("todo")
-public class ToDoController {
+public class TodoController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ToDoController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TodoController.class);
 
     protected static final String FEEDBACK_MESSAGE_KEY_TODO_ADDED = "feedback.message.todo.added";
     protected static final String FEEDBACK_MESSAGE_KEY_TODO_UPDATED = "feedback.message.todo.updated";
@@ -49,7 +49,7 @@ public class ToDoController {
     protected static final String VIEW_TODO_VIEW = "todo/view";
 
     @Resource
-    private ToDoService service;
+    private TodoService service;
 
     @Resource
     private MessageSource messageSource;
@@ -58,14 +58,14 @@ public class ToDoController {
     public String showAddToDoForm(Model model) {
         LOGGER.debug("Rendering add to-do entry form.");
 
-        ToDoDTO formObject = new ToDoDTO();
+        TodoDTO formObject = new TodoDTO();
         model.addAttribute(MODEL_ATTRIBUTE_TODO, formObject);
 
         return VIEW_TODO_ADD;
     }
 
     @RequestMapping(value = "/todo/add", method = RequestMethod.POST)
-    public String add(@Valid @ModelAttribute(MODEL_ATTRIBUTE_TODO) ToDoDTO dto, BindingResult result, RedirectAttributes attributes) {
+    public String add(@Valid @ModelAttribute(MODEL_ATTRIBUTE_TODO) TodoDTO dto, BindingResult result, RedirectAttributes attributes) {
         LOGGER.debug("Adding a new to-do entry with information: {}", dto);
 
         if (result.hasErrors()) {
@@ -73,7 +73,7 @@ public class ToDoController {
             return VIEW_TODO_ADD;
         }
 
-        ToDo added = service.add(dto);
+        Todo added = service.add(dto);
         LOGGER.debug("Added a to-do entry with information: {}", added);
 
         addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_TODO_ADDED, added.getTitle());
@@ -86,7 +86,7 @@ public class ToDoController {
     public String deleteById(@PathVariable("id") Long id, RedirectAttributes attributes) throws ToDoNotFoundException {
         LOGGER.debug("Deleting a to-do entry with id: {}", id);
 
-        ToDo deleted = service.deleteById(id);
+        Todo deleted = service.deleteById(id);
         LOGGER.debug("Deleted to-do entry with information: {}", deleted);
 
         addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_TODO_DELETED, deleted.getTitle());
@@ -98,7 +98,7 @@ public class ToDoController {
     public String findAll(Model model) {
         LOGGER.debug("Rendering to-do list.");
 
-        List<ToDo> models = service.findAll();
+        List<Todo> models = service.findAll();
         LOGGER.debug("Found {} to-do entries.", models.size());
 
         model.addAttribute(MODEL_ATTRIBUTE_TODO_LIST, models);
@@ -110,7 +110,7 @@ public class ToDoController {
     public String findById(@PathVariable("id") Long id, Model model) throws ToDoNotFoundException {
         LOGGER.debug("Rendering to-do page for to-do entry with id: {}", id);
 
-        ToDo found = service.findById(id);
+        Todo found = service.findById(id);
         LOGGER.debug("Found to-do entry with information: {}", found);
 
         model.addAttribute(MODEL_ATTRIBUTE_TODO, found);
@@ -122,17 +122,17 @@ public class ToDoController {
     public String showUpdateToDoForm(@PathVariable("id") Long id, Model model) throws ToDoNotFoundException {
         LOGGER.debug("Rendering update to-do entry form for to-do entry with id: {}", id);
 
-        ToDo updated = service.findById(id);
+        Todo updated = service.findById(id);
         LOGGER.debug("Rendering update to-do form for to-do with information: {}", updated);
 
-        ToDoDTO formObject = constructFormObjectForUpdateForm(updated);
+        TodoDTO formObject = constructFormObjectForUpdateForm(updated);
         model.addAttribute(MODEL_ATTRIBUTE_TODO, formObject);
 
         return VIEW_TODO_UPDATE;
     }
 
     @RequestMapping(value = "/todo/update", method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute(MODEL_ATTRIBUTE_TODO) ToDoDTO dto, BindingResult result, RedirectAttributes attributes) throws ToDoNotFoundException {
+    public String update(@Valid @ModelAttribute(MODEL_ATTRIBUTE_TODO) TodoDTO dto, BindingResult result, RedirectAttributes attributes) throws ToDoNotFoundException {
         LOGGER.debug("Updating a to-do entry with information: {}", dto);
 
         if (result.hasErrors()) {
@@ -140,7 +140,7 @@ public class ToDoController {
             return VIEW_TODO_UPDATE;
         }
 
-        ToDo updated = service.update(dto);
+        Todo updated = service.update(dto);
         LOGGER.debug("Updated the information of a to-entry to: {}", updated);
 
         addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_TODO_UPDATED, updated.getTitle());
@@ -149,8 +149,8 @@ public class ToDoController {
         return createRedirectViewPath(REQUEST_MAPPING_TODO_VIEW);
     }
 
-    private ToDoDTO constructFormObjectForUpdateForm(ToDo updated) {
-        ToDoDTO dto = new ToDoDTO();
+    private TodoDTO constructFormObjectForUpdateForm(Todo updated) {
+        TodoDTO dto = new TodoDTO();
 
         dto.setId(updated.getId());
         dto.setDescription(updated.getDescription());

@@ -1,10 +1,10 @@
 package net.petrikainulainen.spring.testmvc.todo.service;
 
-import net.petrikainulainen.spring.testmvc.todo.ToDoTestUtil;
-import net.petrikainulainen.spring.testmvc.todo.dto.ToDoDTO;
+import net.petrikainulainen.spring.testmvc.todo.TodoTestUtil;
+import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
 import net.petrikainulainen.spring.testmvc.todo.exception.ToDoNotFoundException;
-import net.petrikainulainen.spring.testmvc.todo.model.ToDo;
-import net.petrikainulainen.spring.testmvc.todo.repository.ToDoRepository;
+import net.petrikainulainen.spring.testmvc.todo.model.Todo;
+import net.petrikainulainen.spring.testmvc.todo.repository.TodoRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -20,31 +20,31 @@ import static org.mockito.Mockito.*;
 /**
  * @author Petri Kainulainen
  */
-public class RepositoryToDoServiceTest {
+public class RepositoryTodoServiceTest {
 
-    private RepositoryToDoService service;
+    private RepositoryTodoService service;
 
-    private ToDoRepository repositoryMock;
+    private TodoRepository repositoryMock;
 
     @Before
     public void setUp() {
-        service = new RepositoryToDoService();
+        service = new RepositoryTodoService();
 
-        repositoryMock = mock(ToDoRepository.class);
+        repositoryMock = mock(TodoRepository.class);
         ReflectionTestUtils.setField(service, "repository", repositoryMock);
     }
 
     @Test
     public void add() {
-        ToDoDTO dto = ToDoTestUtil.createDTO(null, ToDoTestUtil.DESCRIPTION, ToDoTestUtil.TITLE);
+        TodoDTO dto = TodoTestUtil.createDTO(null, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
 
         service.add(dto);
 
-        ArgumentCaptor<ToDo> toDoArgument = ArgumentCaptor.forClass(ToDo.class);
+        ArgumentCaptor<Todo> toDoArgument = ArgumentCaptor.forClass(Todo.class);
         verify(repositoryMock, times(1)).save(toDoArgument.capture());
         verifyNoMoreInteractions(repositoryMock);
 
-        ToDo model = toDoArgument.getValue();
+        Todo model = toDoArgument.getValue();
 
         assertNull(model.getId());
         assertEquals(dto.getDescription(), model.getDescription());
@@ -53,12 +53,12 @@ public class RepositoryToDoServiceTest {
 
     @Test
     public void deleteById() throws ToDoNotFoundException {
-        ToDo model = ToDoTestUtil.createModel(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION, ToDoTestUtil.TITLE);
-        when(repositoryMock.findOne(ToDoTestUtil.ID)).thenReturn(model);
+        Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
+        when(repositoryMock.findOne(TodoTestUtil.ID)).thenReturn(model);
 
-        ToDo actual = service.deleteById(ToDoTestUtil.ID);
+        Todo actual = service.deleteById(TodoTestUtil.ID);
 
-        verify(repositoryMock, times(1)).findOne(ToDoTestUtil.ID);
+        verify(repositoryMock, times(1)).findOne(TodoTestUtil.ID);
         verify(repositoryMock, times(1)).delete(model);
         verifyNoMoreInteractions(repositoryMock);
 
@@ -67,20 +67,20 @@ public class RepositoryToDoServiceTest {
 
     @Test(expected = ToDoNotFoundException.class)
     public void deleteByIdWhenToDoIsNotFound() throws ToDoNotFoundException {
-        when(repositoryMock.findOne(ToDoTestUtil.ID)).thenReturn(null);
+        when(repositoryMock.findOne(TodoTestUtil.ID)).thenReturn(null);
 
-        service.deleteById(ToDoTestUtil.ID);
+        service.deleteById(TodoTestUtil.ID);
 
-        verify(repositoryMock, times(1)).findOne(ToDoTestUtil.ID);
+        verify(repositoryMock, times(1)).findOne(TodoTestUtil.ID);
         verifyNoMoreInteractions(repositoryMock);
     }
 
     @Test
     public void findAll() {
-        List<ToDo> models = new ArrayList<ToDo>();
+        List<Todo> models = new ArrayList<Todo>();
         when(repositoryMock.findAll()).thenReturn(models);
 
-        List<ToDo> actual = service.findAll();
+        List<Todo> actual = service.findAll();
 
         verify(repositoryMock, times(1)).findAll();
         verifyNoMoreInteractions(repositoryMock);
@@ -90,12 +90,12 @@ public class RepositoryToDoServiceTest {
 
     @Test
     public void findById() throws ToDoNotFoundException {
-        ToDo model = ToDoTestUtil.createModel(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION, ToDoTestUtil.TITLE);
-        when(repositoryMock.findOne(ToDoTestUtil.ID)).thenReturn(model);
+        Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
+        when(repositoryMock.findOne(TodoTestUtil.ID)).thenReturn(model);
 
-        ToDo actual = service.findById(ToDoTestUtil.ID);
+        Todo actual = service.findById(TodoTestUtil.ID);
 
-        verify(repositoryMock, times(1)).findOne(ToDoTestUtil.ID);
+        verify(repositoryMock, times(1)).findOne(TodoTestUtil.ID);
         verifyNoMoreInteractions(repositoryMock);
 
         assertEquals(model, actual);
@@ -103,21 +103,21 @@ public class RepositoryToDoServiceTest {
 
     @Test(expected = ToDoNotFoundException.class)
     public void findByIdWhenToDoIsNotFound() throws ToDoNotFoundException {
-        when(repositoryMock.findOne(ToDoTestUtil.ID)).thenReturn(null);
+        when(repositoryMock.findOne(TodoTestUtil.ID)).thenReturn(null);
 
-        service.findById(ToDoTestUtil.ID);
+        service.findById(TodoTestUtil.ID);
 
-        verify(repositoryMock, times(1)).findOne(ToDoTestUtil.ID);
+        verify(repositoryMock, times(1)).findOne(TodoTestUtil.ID);
         verifyNoMoreInteractions(repositoryMock);
     }
 
     @Test
     public void update() throws ToDoNotFoundException {
-        ToDoDTO dto = ToDoTestUtil.createDTO(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION_UPDATED, ToDoTestUtil.TITLE_UPDATED);
-        ToDo model = ToDoTestUtil.createModel(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION, ToDoTestUtil.TITLE);
+        TodoDTO dto = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
+        Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
         when(repositoryMock.findOne(dto.getId())).thenReturn(model);
 
-        ToDo actual = service.update(dto);
+        Todo actual = service.update(dto);
 
         verify(repositoryMock, times(1)).findOne(dto.getId());
         verifyNoMoreInteractions(repositoryMock);
@@ -129,7 +129,7 @@ public class RepositoryToDoServiceTest {
 
     @Test(expected = ToDoNotFoundException.class)
     public void updateWhenToDoIsNotFound() throws ToDoNotFoundException {
-        ToDoDTO dto = ToDoTestUtil.createDTO(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION_UPDATED, ToDoTestUtil.TITLE_UPDATED);
+        TodoDTO dto = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
         when(repositoryMock.findOne(dto.getId())).thenReturn(null);
 
         service.update(dto);

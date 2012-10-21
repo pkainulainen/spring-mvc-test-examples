@@ -1,11 +1,11 @@
 package net.petrikainulainen.spring.testmvc.todo.controller;
 
-import net.petrikainulainen.spring.testmvc.todo.ToDoTestUtil;
+import net.petrikainulainen.spring.testmvc.todo.TodoTestUtil;
 import net.petrikainulainen.spring.testmvc.todo.config.UnitTestContext;
-import net.petrikainulainen.spring.testmvc.todo.dto.ToDoDTO;
+import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
 import net.petrikainulainen.spring.testmvc.todo.exception.ToDoNotFoundException;
-import net.petrikainulainen.spring.testmvc.todo.model.ToDo;
-import net.petrikainulainen.spring.testmvc.todo.service.ToDoService;
+import net.petrikainulainen.spring.testmvc.todo.model.Todo;
+import net.petrikainulainen.spring.testmvc.todo.service.TodoService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,29 +40,29 @@ import static org.mockito.Mockito.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {UnitTestContext.class})
-public class ToDoControllerTest {
+public class TodoControllerTest {
 
     private static final String FEEDBACK_MESSAGE = "feedbackMessage";
     private static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_TITLE = "title";
 
-    private ToDoController controller;
+    private TodoController controller;
 
     private MessageSource messageSourceMock;
 
-    private ToDoService serviceMock;
+    private TodoService serviceMock;
 
     @Resource
     private Validator validator;
 
     @Before
     public void setUp() {
-        controller = new ToDoController();
+        controller = new TodoController();
 
         messageSourceMock = mock(MessageSource.class);
         ReflectionTestUtils.setField(controller, "messageSource", messageSourceMock);
 
-        serviceMock = mock(ToDoService.class);
+        serviceMock = mock(TodoService.class);
         ReflectionTestUtils.setField(controller, "service", serviceMock);
     }
 
@@ -73,9 +73,9 @@ public class ToDoControllerTest {
         String view = controller.showAddToDoForm(model);
 
         verifyZeroInteractions(messageSourceMock, serviceMock);
-        assertEquals(ToDoController.VIEW_TODO_ADD, view);
+        assertEquals(TodoController.VIEW_TODO_ADD, view);
 
-        ToDoDTO formObject = (ToDoDTO) model.asMap().get(ToDoController.MODEL_ATTRIBUTE_TODO);
+        TodoDTO formObject = (TodoDTO) model.asMap().get(TodoController.MODEL_ATTRIBUTE_TODO);
 
         assertNull(formObject.getId());
         assertNull(formObject.getDescription());
@@ -84,9 +84,9 @@ public class ToDoControllerTest {
 
     @Test
     public void add() {
-        ToDoDTO formObject = ToDoTestUtil.createDTO(null, ToDoTestUtil.DESCRIPTION, ToDoTestUtil.TITLE);
+        TodoDTO formObject = TodoTestUtil.createDTO(null, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
 
-        ToDo model = ToDoTestUtil.createModel(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION, ToDoTestUtil.TITLE);
+        Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
         when(serviceMock.add(formObject)).thenReturn(model);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
@@ -94,24 +94,24 @@ public class ToDoControllerTest {
 
         RedirectAttributesModelMap attributes = new RedirectAttributesModelMap();
 
-        initMessageSourceForFeedbackMessage(ToDoController.FEEDBACK_MESSAGE_KEY_TODO_ADDED);
+        initMessageSourceForFeedbackMessage(TodoController.FEEDBACK_MESSAGE_KEY_TODO_ADDED);
 
         String view = controller.add(formObject, result, attributes);
 
         verify(serviceMock, times(1)).add(formObject);
         verifyNoMoreInteractions(serviceMock);
 
-        String expectedView = ToDoTestUtil.createRedirectViewPath(ToDoController.REQUEST_MAPPING_TODO_VIEW);
+        String expectedView = TodoTestUtil.createRedirectViewPath(TodoController.REQUEST_MAPPING_TODO_VIEW);
         assertEquals(expectedView, view);
 
-        assertEquals(Long.valueOf((String) attributes.get(ToDoController.PARAMETER_TODO_ID)), model.getId());
+        assertEquals(Long.valueOf((String) attributes.get(TodoController.PARAMETER_TODO_ID)), model.getId());
 
-        assertFeedbackMessage(attributes, ToDoController.FEEDBACK_MESSAGE_KEY_TODO_ADDED);
+        assertFeedbackMessage(attributes, TodoController.FEEDBACK_MESSAGE_KEY_TODO_ADDED);
     }
 
     @Test
     public void addEmptyTodo() {
-        ToDoDTO formObject = ToDoTestUtil.createDTO(null, "", "");
+        TodoDTO formObject = TodoTestUtil.createDTO(null, "", "");
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
         BindingResult result = bindAndValidate(mockRequest, formObject);
@@ -122,16 +122,16 @@ public class ToDoControllerTest {
 
         verifyZeroInteractions(serviceMock, messageSourceMock);
 
-        assertEquals(ToDoController.VIEW_TODO_ADD, view);
+        assertEquals(TodoController.VIEW_TODO_ADD, view);
         assertFieldErrors(result, FIELD_TITLE);
     }
 
     @Test
     public void addToDoWithTooLongDescriptionAndTitle() {
-        String description = ToDoTestUtil.createStringWithLength(ToDo.MAX_LENGTH_DESCRIPTION + 1);
-        String title = ToDoTestUtil.createStringWithLength(ToDo.MAX_LENGTH_TITLE + 1);
+        String description = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
+        String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
 
-        ToDoDTO formObject = ToDoTestUtil.createDTO(null, description, title);
+        TodoDTO formObject = TodoTestUtil.createDTO(null, description, title);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
         BindingResult result = bindAndValidate(mockRequest, formObject);
@@ -142,7 +142,7 @@ public class ToDoControllerTest {
 
         verifyZeroInteractions(serviceMock, messageSourceMock);
 
-        assertEquals(ToDoController.VIEW_TODO_ADD, view);
+        assertEquals(TodoController.VIEW_TODO_ADD, view);
         assertFieldErrors(result, FIELD_DESCRIPTION, FIELD_TITLE);
     }
 
@@ -150,19 +150,19 @@ public class ToDoControllerTest {
     public void deleteById() throws ToDoNotFoundException {
         RedirectAttributesModelMap attributes = new RedirectAttributesModelMap();
 
-        ToDo model = ToDoTestUtil.createModel(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION, ToDoTestUtil.TITLE);
-        when(serviceMock.deleteById(ToDoTestUtil.ID)).thenReturn(model);
+        Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
+        when(serviceMock.deleteById(TodoTestUtil.ID)).thenReturn(model);
 
-        initMessageSourceForFeedbackMessage(ToDoController.FEEDBACK_MESSAGE_KEY_TODO_DELETED);
+        initMessageSourceForFeedbackMessage(TodoController.FEEDBACK_MESSAGE_KEY_TODO_DELETED);
 
-        String view = controller.deleteById(ToDoTestUtil.ID, attributes);
+        String view = controller.deleteById(TodoTestUtil.ID, attributes);
 
-        verify(serviceMock, times(1)).deleteById(ToDoTestUtil.ID);
+        verify(serviceMock, times(1)).deleteById(TodoTestUtil.ID);
         verifyNoMoreInteractions(serviceMock);
 
-        assertFeedbackMessage(attributes, ToDoController.FEEDBACK_MESSAGE_KEY_TODO_DELETED);
+        assertFeedbackMessage(attributes, TodoController.FEEDBACK_MESSAGE_KEY_TODO_DELETED);
 
-        String expectedView = ToDoTestUtil.createRedirectViewPath(ToDoController.REQUEST_MAPPING_TODO_LIST);
+        String expectedView = TodoTestUtil.createRedirectViewPath(TodoController.REQUEST_MAPPING_TODO_LIST);
         assertEquals(expectedView, view);
     }
 
@@ -170,11 +170,11 @@ public class ToDoControllerTest {
     public void deleteByIdWhenToDoIsNotFound() throws ToDoNotFoundException {
         RedirectAttributesModelMap attributes = new RedirectAttributesModelMap();
 
-        when(serviceMock.deleteById(ToDoTestUtil.ID)).thenThrow(new ToDoNotFoundException(""));
+        when(serviceMock.deleteById(TodoTestUtil.ID)).thenThrow(new ToDoNotFoundException(""));
 
-        controller.deleteById(ToDoTestUtil.ID, attributes);
+        controller.deleteById(TodoTestUtil.ID, attributes);
 
-        verify(serviceMock, times(1)).deleteById(ToDoTestUtil.ID);
+        verify(serviceMock, times(1)).deleteById(TodoTestUtil.ID);
         verifyNoMoreInteractions(serviceMock);
         verifyZeroInteractions(messageSourceMock);
     }
@@ -183,7 +183,7 @@ public class ToDoControllerTest {
     public void findAll() {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
-        List<ToDo> models = new ArrayList<ToDo>();
+        List<Todo> models = new ArrayList<Todo>();
         when(serviceMock.findAll()).thenReturn(models);
 
         String view = controller.findAll(model);
@@ -192,36 +192,36 @@ public class ToDoControllerTest {
         verifyNoMoreInteractions(serviceMock);
         verifyZeroInteractions(messageSourceMock);
 
-        assertEquals(ToDoController.VIEW_TODO_LIST, view);
-        assertEquals(models, model.asMap().get(ToDoController.MODEL_ATTRIBUTE_TODO_LIST));
+        assertEquals(TodoController.VIEW_TODO_LIST, view);
+        assertEquals(models, model.asMap().get(TodoController.MODEL_ATTRIBUTE_TODO_LIST));
     }
 
     @Test
     public void findById() throws ToDoNotFoundException {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
-        ToDo found = ToDoTestUtil.createModel(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION, ToDoTestUtil.TITLE);
-        when(serviceMock.findById(ToDoTestUtil.ID)).thenReturn(found);
+        Todo found = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
+        when(serviceMock.findById(TodoTestUtil.ID)).thenReturn(found);
 
-        String view = controller.findById(ToDoTestUtil.ID, model);
+        String view = controller.findById(TodoTestUtil.ID, model);
 
-        verify(serviceMock, times(1)).findById(ToDoTestUtil.ID);
+        verify(serviceMock, times(1)).findById(TodoTestUtil.ID);
         verifyNoMoreInteractions(serviceMock);
         verifyZeroInteractions(messageSourceMock);
 
-        assertEquals(ToDoController.VIEW_TODO_VIEW, view);
-        assertEquals(found, model.asMap().get(ToDoController.MODEL_ATTRIBUTE_TODO));
+        assertEquals(TodoController.VIEW_TODO_VIEW, view);
+        assertEquals(found, model.asMap().get(TodoController.MODEL_ATTRIBUTE_TODO));
     }
 
     @Test(expected = ToDoNotFoundException.class)
     public void findByIdWhenToDoIsNotFound() throws ToDoNotFoundException {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
-        when(serviceMock.findById(ToDoTestUtil.ID)).thenThrow(new ToDoNotFoundException(""));
+        when(serviceMock.findById(TodoTestUtil.ID)).thenThrow(new ToDoNotFoundException(""));
 
-        controller.findById(ToDoTestUtil.ID, model);
+        controller.findById(TodoTestUtil.ID, model);
 
-        verify(serviceMock, times(1)).findById(ToDoTestUtil.ID);
+        verify(serviceMock, times(1)).findById(TodoTestUtil.ID);
         verifyNoMoreInteractions(serviceMock);
         verifyZeroInteractions(messageSourceMock);
     }
@@ -230,18 +230,18 @@ public class ToDoControllerTest {
     public void showUpdateToDoForm() throws ToDoNotFoundException {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
-        ToDo updated = ToDoTestUtil.createModel(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION, ToDoTestUtil.TITLE);
-        when(serviceMock.findById(ToDoTestUtil.ID)).thenReturn(updated);
+        Todo updated = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
+        when(serviceMock.findById(TodoTestUtil.ID)).thenReturn(updated);
 
-        String view = controller.showUpdateToDoForm(ToDoTestUtil.ID, model);
+        String view = controller.showUpdateToDoForm(TodoTestUtil.ID, model);
 
-        verify(serviceMock, times(1)).findById(ToDoTestUtil.ID);
+        verify(serviceMock, times(1)).findById(TodoTestUtil.ID);
         verifyNoMoreInteractions(serviceMock);
         verifyZeroInteractions(messageSourceMock);
 
-        assertEquals(ToDoController.VIEW_TODO_UPDATE, view);
+        assertEquals(TodoController.VIEW_TODO_UPDATE, view);
 
-        ToDoDTO formObject = (ToDoDTO) model.asMap().get(ToDoController.MODEL_ATTRIBUTE_TODO);
+        TodoDTO formObject = (TodoDTO) model.asMap().get(TodoController.MODEL_ATTRIBUTE_TODO);
 
         assertEquals(updated.getId(), formObject.getId());
         assertEquals(updated.getDescription(), formObject.getDescription());
@@ -252,20 +252,20 @@ public class ToDoControllerTest {
     public void showUpdateToDoFormWhenToDoIsNotFound() throws ToDoNotFoundException {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
-        when(serviceMock.findById(ToDoTestUtil.ID)).thenThrow(new ToDoNotFoundException(""));
+        when(serviceMock.findById(TodoTestUtil.ID)).thenThrow(new ToDoNotFoundException(""));
 
-        controller.showUpdateToDoForm(ToDoTestUtil.ID, model);
+        controller.showUpdateToDoForm(TodoTestUtil.ID, model);
 
-        verify(serviceMock, times(1)).findById(ToDoTestUtil.ID);
+        verify(serviceMock, times(1)).findById(TodoTestUtil.ID);
         verifyNoMoreInteractions(serviceMock);
         verifyZeroInteractions(messageSourceMock);
     }
 
     @Test
     public void update() throws ToDoNotFoundException {
-        ToDoDTO formObject = ToDoTestUtil.createDTO(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION_UPDATED, ToDoTestUtil.TITLE_UPDATED);
+        TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
 
-        ToDo model = ToDoTestUtil.createModel(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION_UPDATED, ToDoTestUtil.TITLE_UPDATED);
+        Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
         when(serviceMock.update(formObject)).thenReturn(model);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
@@ -273,24 +273,24 @@ public class ToDoControllerTest {
 
         RedirectAttributesModelMap attributes = new RedirectAttributesModelMap();
 
-        initMessageSourceForFeedbackMessage(ToDoController.FEEDBACK_MESSAGE_KEY_TODO_UPDATED);
+        initMessageSourceForFeedbackMessage(TodoController.FEEDBACK_MESSAGE_KEY_TODO_UPDATED);
 
         String view = controller.update(formObject, result, attributes);
 
         verify(serviceMock, times(1)).update(formObject);
         verifyNoMoreInteractions(serviceMock);
 
-        String expectedView = ToDoTestUtil.createRedirectViewPath(ToDoController.REQUEST_MAPPING_TODO_VIEW);
+        String expectedView = TodoTestUtil.createRedirectViewPath(TodoController.REQUEST_MAPPING_TODO_VIEW);
         assertEquals(expectedView, view);
 
-        assertEquals(Long.valueOf((String) attributes.get(ToDoController.PARAMETER_TODO_ID)), model.getId());
+        assertEquals(Long.valueOf((String) attributes.get(TodoController.PARAMETER_TODO_ID)), model.getId());
 
-        assertFeedbackMessage(attributes, ToDoController.FEEDBACK_MESSAGE_KEY_TODO_UPDATED);
+        assertFeedbackMessage(attributes, TodoController.FEEDBACK_MESSAGE_KEY_TODO_UPDATED);
     }
 
     @Test
     public void updateEmptyToDo() throws ToDoNotFoundException {
-        ToDoDTO formObject = ToDoTestUtil.createDTO(ToDoTestUtil.ID, "", "");
+        TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, "", "");
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
         BindingResult result = bindAndValidate(mockRequest, formObject);
@@ -301,16 +301,16 @@ public class ToDoControllerTest {
 
         verifyZeroInteractions(messageSourceMock, serviceMock);
 
-        assertEquals(ToDoController.VIEW_TODO_UPDATE, view);
+        assertEquals(TodoController.VIEW_TODO_UPDATE, view);
         assertFieldErrors(result, FIELD_TITLE);
     }
 
     @Test
     public void updateToDoWhenDescriptionAndTitleAreTooLong() throws ToDoNotFoundException {
-        String description = ToDoTestUtil.createStringWithLength(ToDo.MAX_LENGTH_DESCRIPTION + 1);
-        String title = ToDoTestUtil.createStringWithLength(ToDo.MAX_LENGTH_TITLE + 1);
+        String description = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
+        String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
 
-        ToDoDTO formObject = ToDoTestUtil.createDTO(ToDoTestUtil.ID, description, title);
+        TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, description, title);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
         BindingResult result = bindAndValidate(mockRequest, formObject);
@@ -321,13 +321,13 @@ public class ToDoControllerTest {
 
         verifyZeroInteractions(messageSourceMock, serviceMock);
 
-        assertEquals(ToDoController.VIEW_TODO_UPDATE, view);
+        assertEquals(TodoController.VIEW_TODO_UPDATE, view);
         assertFieldErrors(result, FIELD_DESCRIPTION, FIELD_TITLE);
     }
 
     @Test(expected = ToDoNotFoundException.class)
     public void updateWhenToDoIsNotFound() throws ToDoNotFoundException {
-        ToDoDTO formObject = ToDoTestUtil.createDTO(ToDoTestUtil.ID, ToDoTestUtil.DESCRIPTION_UPDATED, ToDoTestUtil.TITLE_UPDATED);
+        TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
 
         when(serviceMock.update(formObject)).thenThrow(new ToDoNotFoundException(""));
 
@@ -344,7 +344,7 @@ public class ToDoControllerTest {
     }
 
     private void assertFeedbackMessage(RedirectAttributes attributes, String messageCode) {
-        assertFlashMessages(attributes, messageCode, ToDoController.FLASH_MESSAGE_KEY_FEEDBACK);
+        assertFlashMessages(attributes, messageCode, TodoController.FLASH_MESSAGE_KEY_FEEDBACK);
     }
 
     private void assertFieldErrors(BindingResult result, String... fieldNames) {

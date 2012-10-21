@@ -1,6 +1,6 @@
 package net.petrikainulainen.spring.testmvc.todo.dto;
 
-import net.petrikainulainen.spring.testmvc.todo.model.ToDo;
+import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -8,18 +8,18 @@ import org.hibernate.validator.constraints.NotEmpty;
 /**
  * @author Petri Kainulainen
  */
-public class ToDoDTO {
+public class TodoDTO {
 
     private Long id;
 
-    @Length(max = ToDo.MAX_LENGTH_DESCRIPTION)
+    @Length(max = Todo.MAX_LENGTH_DESCRIPTION)
     private String description;
 
     @NotEmpty
-    @Length(max = ToDo.MAX_LENGTH_TITLE)
+    @Length(max = Todo.MAX_LENGTH_TITLE)
     private String title;
 
-    public ToDoDTO() {
+    public TodoDTO() {
 
     }
 

@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="todos")
-public class ToDo {
+public class Todo {
 
     public static final int MAX_LENGTH_DESCRIPTION = 500;
     public static final int MAX_LENGTH_TITLE = 100;
@@ -37,7 +37,7 @@ public class ToDo {
     @Version
     private long version;
 
-    public ToDo() {
+    public Todo() {
 
     }
 
@@ -88,14 +88,14 @@ public class ToDo {
 
     public static class Builder {
 
-        private ToDo built;
+        private Todo built;
 
         public Builder(String title) {
-            built = new ToDo();
+            built = new Todo();
             built.title = title;
         }
 
-        public ToDo build() {
+        public Todo build() {
             return built;
         }
 

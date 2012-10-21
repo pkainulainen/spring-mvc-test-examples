@@ -8,7 +8,7 @@ import net.petrikainulainen.spring.testmvc.ApplicationContextSetup;
 import net.petrikainulainen.spring.testmvc.common.controller.ErrorController;
 import net.petrikainulainen.spring.testmvc.config.ExampleApplicationContext;
 import net.petrikainulainen.spring.testmvc.config.IntegrationTestApplicationContext;
-import net.petrikainulainen.spring.testmvc.todo.ToDoTestUtil;
+import net.petrikainulainen.spring.testmvc.todo.TodoTestUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,7 +39,7 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.*
         TransactionalTestExecutionListener.class,
         DbUnitTestExecutionListener.class })
 @DatabaseSetup("toDoData.xml")
-public class ITAnnotationToDoControllerTest {
+public class ITAnnotationTodoControllerTest {
 
     @Resource
     private DataSource datasource;
@@ -54,17 +54,17 @@ public class ITAnnotationToDoControllerTest {
     public void findAll() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(view().name(ToDoController.VIEW_TODO_LIST))
+                .andExpect(view().name(TodoController.VIEW_TODO_LIST))
                 .andExpect(forwardedUrl("/WEB-INF/jsp/todo/list.jsp"))
-                .andExpect(model().attribute(ToDoController.MODEL_ATTRIBUTE_TODO_LIST, hasSize(2)))
-                .andExpect(model().attribute(ToDoController.MODEL_ATTRIBUTE_TODO_LIST, hasItem(
-                   allOf(
-                           hasProperty("id", is(1L)),
-                           hasProperty("description", is("Lorem ipsum")),
-                           hasProperty("title", is("Foo"))
-                   )
+                .andExpect(model().attribute(TodoController.MODEL_ATTRIBUTE_TODO_LIST, hasSize(2)))
+                .andExpect(model().attribute(TodoController.MODEL_ATTRIBUTE_TODO_LIST, hasItem(
+                        allOf(
+                                hasProperty("id", is(1L)),
+                                hasProperty("description", is("Lorem ipsum")),
+                                hasProperty("title", is("Foo"))
+                        )
                 )))
-                .andExpect(model().attribute(ToDoController.MODEL_ATTRIBUTE_TODO_LIST, hasItem(
+                .andExpect(model().attribute(TodoController.MODEL_ATTRIBUTE_TODO_LIST, hasItem(
                         allOf(
                                 hasProperty("id", is(2L)),
                                 hasProperty("description", is("Lorem ipsum")),
@@ -78,11 +78,11 @@ public class ITAnnotationToDoControllerTest {
     public void findById() throws Exception {
         mockMvc.perform(get("/todo/{id}", 1L))
                 .andExpect(status().isOk())
-                .andExpect(view().name(ToDoController.VIEW_TODO_VIEW))
+                .andExpect(view().name(TodoController.VIEW_TODO_VIEW))
                 .andExpect(forwardedUrl("/WEB-INF/jsp/todo/view.jsp"))
-                .andExpect(model().attribute(ToDoController.MODEL_ATTRIBUTE_TODO, hasProperty("id", is(1L))))
-                .andExpect(model().attribute(ToDoController.MODEL_ATTRIBUTE_TODO, hasProperty("description", is("Lorem ipsum"))))
-                .andExpect(model().attribute(ToDoController.MODEL_ATTRIBUTE_TODO, hasProperty("title", is("Foo"))));
+                .andExpect(model().attribute(TodoController.MODEL_ATTRIBUTE_TODO, hasProperty("id", is(1L))))
+                .andExpect(model().attribute(TodoController.MODEL_ATTRIBUTE_TODO, hasProperty("description", is("Lorem ipsum"))))
+                .andExpect(model().attribute(TodoController.MODEL_ATTRIBUTE_TODO, hasProperty("title", is("Foo"))));
     }
 
     @Test
@@ -97,11 +97,11 @@ public class ITAnnotationToDoControllerTest {
     @Test
     @ExpectedDatabase("todoData-delete-expected.xml")
     public void deleteById() throws Exception {
-        String expectedRedirectViewPath = ToDoTestUtil.createRedirectViewPath(ToDoController.REQUEST_MAPPING_TODO_LIST);
+        String expectedRedirectViewPath = TodoTestUtil.createRedirectViewPath(TodoController.REQUEST_MAPPING_TODO_LIST);
         mockMvc.perform(get("/todo/delete/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(view().name(expectedRedirectViewPath))
-                .andExpect(flash().attribute(ToDoController.FLASH_MESSAGE_KEY_FEEDBACK, is("To-Do entry: Foo was deleted.")));
+                .andExpect(flash().attribute(TodoController.FLASH_MESSAGE_KEY_FEEDBACK, is("To-Do entry: Foo was deleted.")));
     }
 
     @Test
