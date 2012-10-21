@@ -21,7 +21,7 @@
     <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
         <property name="exceptionMappings">
             <props>
-                <prop key="net.petrikainulainen.spring.testmvc.todo.exception.ToDoNotFoundException">error/404</prop>
+                <prop key="net.petrikainulainen.spring.testmvc.todo.exception.TodoNotFoundException">error/404</prop>
                 <prop key="java.lang.Exception">error/error</prop>
                 <prop key="java.lang.RuntimeException">error/error</prop>
             </props>

@@ -1,7 +1,7 @@
 package net.petrikainulainen.spring.testmvc.todo.controller;
 
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
-import net.petrikainulainen.spring.testmvc.todo.exception.ToDoNotFoundException;
+import net.petrikainulainen.spring.testmvc.todo.exception.TodoNotFoundException;
 import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 import net.petrikainulainen.spring.testmvc.todo.service.TodoService;
 import org.slf4j.Logger;
@@ -83,7 +83,7 @@ public class TodoController {
     }
 
     @RequestMapping(value = "/todo/delete/{id}", method = RequestMethod.GET)
-    public String deleteById(@PathVariable("id") Long id, RedirectAttributes attributes) throws ToDoNotFoundException {
+    public String deleteById(@PathVariable("id") Long id, RedirectAttributes attributes) throws TodoNotFoundException {
         LOGGER.debug("Deleting a to-do entry with id: {}", id);
 
         Todo deleted = service.deleteById(id);
@@ -107,7 +107,7 @@ public class TodoController {
     }
 
     @RequestMapping(value = REQUEST_MAPPING_TODO_VIEW, method = RequestMethod.GET)
-    public String findById(@PathVariable("id") Long id, Model model) throws ToDoNotFoundException {
+    public String findById(@PathVariable("id") Long id, Model model) throws TodoNotFoundException {
         LOGGER.debug("Rendering to-do page for to-do entry with id: {}", id);
 
         Todo found = service.findById(id);
@@ -119,7 +119,7 @@ public class TodoController {
     }
 
     @RequestMapping(value = "/todo/update/{id}", method = RequestMethod.GET)
-    public String showUpdateToDoForm(@PathVariable("id") Long id, Model model) throws ToDoNotFoundException {
+    public String showUpdateToDoForm(@PathVariable("id") Long id, Model model) throws TodoNotFoundException {
         LOGGER.debug("Rendering update to-do entry form for to-do entry with id: {}", id);
 
         Todo updated = service.findById(id);
@@ -132,7 +132,7 @@ public class TodoController {
     }
 
     @RequestMapping(value = "/todo/update", method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute(MODEL_ATTRIBUTE_TODO) TodoDTO dto, BindingResult result, RedirectAttributes attributes) throws ToDoNotFoundException {
+    public String update(@Valid @ModelAttribute(MODEL_ATTRIBUTE_TODO) TodoDTO dto, BindingResult result, RedirectAttributes attributes) throws TodoNotFoundException {
         LOGGER.debug("Updating a to-do entry with information: {}", dto);
 
         if (result.hasErrors()) {

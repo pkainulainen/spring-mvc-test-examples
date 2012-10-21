@@ -3,7 +3,7 @@ package net.petrikainulainen.spring.testmvc.todo.controller;
 import net.petrikainulainen.spring.testmvc.todo.TodoTestUtil;
 import net.petrikainulainen.spring.testmvc.todo.config.UnitTestContext;
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
-import net.petrikainulainen.spring.testmvc.todo.exception.ToDoNotFoundException;
+import net.petrikainulainen.spring.testmvc.todo.exception.TodoNotFoundException;
 import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 import net.petrikainulainen.spring.testmvc.todo.service.TodoService;
 import org.junit.Before;
@@ -147,7 +147,7 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void deleteById() throws ToDoNotFoundException {
+    public void deleteById() throws TodoNotFoundException {
         RedirectAttributesModelMap attributes = new RedirectAttributesModelMap();
 
         Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
@@ -166,11 +166,11 @@ public class TodoControllerTest {
         assertEquals(expectedView, view);
     }
 
-    @Test(expected = ToDoNotFoundException.class)
-    public void deleteByIdWhenToDoIsNotFound() throws ToDoNotFoundException {
+    @Test(expected = TodoNotFoundException.class)
+    public void deleteByIdWhenToDoIsNotFound() throws TodoNotFoundException {
         RedirectAttributesModelMap attributes = new RedirectAttributesModelMap();
 
-        when(serviceMock.deleteById(TodoTestUtil.ID)).thenThrow(new ToDoNotFoundException(""));
+        when(serviceMock.deleteById(TodoTestUtil.ID)).thenThrow(new TodoNotFoundException(""));
 
         controller.deleteById(TodoTestUtil.ID, attributes);
 
@@ -197,7 +197,7 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void findById() throws ToDoNotFoundException {
+    public void findById() throws TodoNotFoundException {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
         Todo found = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
@@ -213,11 +213,11 @@ public class TodoControllerTest {
         assertEquals(found, model.asMap().get(TodoController.MODEL_ATTRIBUTE_TODO));
     }
 
-    @Test(expected = ToDoNotFoundException.class)
-    public void findByIdWhenToDoIsNotFound() throws ToDoNotFoundException {
+    @Test(expected = TodoNotFoundException.class)
+    public void findByIdWhenToDoIsNotFound() throws TodoNotFoundException {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
-        when(serviceMock.findById(TodoTestUtil.ID)).thenThrow(new ToDoNotFoundException(""));
+        when(serviceMock.findById(TodoTestUtil.ID)).thenThrow(new TodoNotFoundException(""));
 
         controller.findById(TodoTestUtil.ID, model);
 
@@ -227,7 +227,7 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void showUpdateToDoForm() throws ToDoNotFoundException {
+    public void showUpdateToDoForm() throws TodoNotFoundException {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
         Todo updated = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
@@ -248,11 +248,11 @@ public class TodoControllerTest {
         assertEquals(updated.getTitle(), formObject.getTitle());
     }
 
-    @Test(expected = ToDoNotFoundException.class)
-    public void showUpdateToDoFormWhenToDoIsNotFound() throws ToDoNotFoundException {
+    @Test(expected = TodoNotFoundException.class)
+    public void showUpdateToDoFormWhenToDoIsNotFound() throws TodoNotFoundException {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
-        when(serviceMock.findById(TodoTestUtil.ID)).thenThrow(new ToDoNotFoundException(""));
+        when(serviceMock.findById(TodoTestUtil.ID)).thenThrow(new TodoNotFoundException(""));
 
         controller.showUpdateToDoForm(TodoTestUtil.ID, model);
 
@@ -262,7 +262,7 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void update() throws ToDoNotFoundException {
+    public void update() throws TodoNotFoundException {
         TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
 
         Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
@@ -289,7 +289,7 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void updateEmptyToDo() throws ToDoNotFoundException {
+    public void updateEmptyToDo() throws TodoNotFoundException {
         TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, "", "");
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
@@ -306,7 +306,7 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void updateToDoWhenDescriptionAndTitleAreTooLong() throws ToDoNotFoundException {
+    public void updateToDoWhenDescriptionAndTitleAreTooLong() throws TodoNotFoundException {
         String description = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
         String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
 
@@ -325,11 +325,11 @@ public class TodoControllerTest {
         assertFieldErrors(result, FIELD_DESCRIPTION, FIELD_TITLE);
     }
 
-    @Test(expected = ToDoNotFoundException.class)
-    public void updateWhenToDoIsNotFound() throws ToDoNotFoundException {
+    @Test(expected = TodoNotFoundException.class)
+    public void updateWhenToDoIsNotFound() throws TodoNotFoundException {
         TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
 
-        when(serviceMock.update(formObject)).thenThrow(new ToDoNotFoundException(""));
+        when(serviceMock.update(formObject)).thenThrow(new TodoNotFoundException(""));
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
         BindingResult result = bindAndValidate(mockRequest, formObject);

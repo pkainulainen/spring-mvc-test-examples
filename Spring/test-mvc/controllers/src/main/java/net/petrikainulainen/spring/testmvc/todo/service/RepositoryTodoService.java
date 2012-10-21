@@ -1,7 +1,7 @@
 package net.petrikainulainen.spring.testmvc.todo.service;
 
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
-import net.petrikainulainen.spring.testmvc.todo.exception.ToDoNotFoundException;
+import net.petrikainulainen.spring.testmvc.todo.exception.TodoNotFoundException;
 import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 import net.petrikainulainen.spring.testmvc.todo.repository.TodoRepository;
 import org.slf4j.Logger;
@@ -35,9 +35,9 @@ public class RepositoryTodoService implements TodoService {
         return repository.save(model);
     }
 
-    @Transactional(rollbackFor = {ToDoNotFoundException.class})
+    @Transactional(rollbackFor = {TodoNotFoundException.class})
     @Override
-    public Todo deleteById(Long id) throws ToDoNotFoundException {
+    public Todo deleteById(Long id) throws TodoNotFoundException {
         LOGGER.debug("Deleting a to-do entry with id: {}", id);
 
         Todo deleted = findById(id);
@@ -54,24 +54,24 @@ public class RepositoryTodoService implements TodoService {
         return repository.findAll();
     }
 
-    @Transactional(readOnly = true, rollbackFor = {ToDoNotFoundException.class})
+    @Transactional(readOnly = true, rollbackFor = {TodoNotFoundException.class})
     @Override
-    public Todo findById(Long id) throws ToDoNotFoundException {
+    public Todo findById(Long id) throws TodoNotFoundException {
         LOGGER.debug("Finding a to-do entry with id: {}", id);
 
         Todo found = repository.findOne(id);
         LOGGER.debug("Found to-do entry: {}", found);
 
         if (found == null) {
-            throw new ToDoNotFoundException("No to-entry found with id: " + id);
+            throw new TodoNotFoundException("No to-entry found with id: " + id);
         }
 
         return found;
     }
 
-    @Transactional(rollbackFor = {ToDoNotFoundException.class})
+    @Transactional(rollbackFor = {TodoNotFoundException.class})
     @Override
-    public Todo update(TodoDTO updated) throws ToDoNotFoundException {
+    public Todo update(TodoDTO updated) throws TodoNotFoundException {
         LOGGER.debug("Updating contact with information: {}", updated);
 
         Todo model = findById(updated.getId());

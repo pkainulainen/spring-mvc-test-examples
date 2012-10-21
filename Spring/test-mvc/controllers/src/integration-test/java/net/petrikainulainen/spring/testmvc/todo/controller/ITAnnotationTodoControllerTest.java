@@ -101,7 +101,7 @@ public class ITAnnotationTodoControllerTest {
         mockMvc.perform(get("/todo/delete/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(view().name(expectedRedirectViewPath))
-                .andExpect(flash().attribute(TodoController.FLASH_MESSAGE_KEY_FEEDBACK, is("To-Do entry: Foo was deleted.")));
+                .andExpect(flash().attribute(TodoController.FLASH_MESSAGE_KEY_FEEDBACK, is("Todo entry: Foo was deleted.")));
     }
 
     @Test

@@ -2,7 +2,7 @@ package net.petrikainulainen.spring.testmvc.todo.service;
 
 import net.petrikainulainen.spring.testmvc.todo.TodoTestUtil;
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
-import net.petrikainulainen.spring.testmvc.todo.exception.ToDoNotFoundException;
+import net.petrikainulainen.spring.testmvc.todo.exception.TodoNotFoundException;
 import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 import net.petrikainulainen.spring.testmvc.todo.repository.TodoRepository;
 import org.junit.Before;
@@ -52,7 +52,7 @@ public class RepositoryTodoServiceTest {
     }
 
     @Test
-    public void deleteById() throws ToDoNotFoundException {
+    public void deleteById() throws TodoNotFoundException {
         Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
         when(repositoryMock.findOne(TodoTestUtil.ID)).thenReturn(model);
 
@@ -65,8 +65,8 @@ public class RepositoryTodoServiceTest {
         assertEquals(model, actual);
     }
 
-    @Test(expected = ToDoNotFoundException.class)
-    public void deleteByIdWhenToDoIsNotFound() throws ToDoNotFoundException {
+    @Test(expected = TodoNotFoundException.class)
+    public void deleteByIdWhenToDoIsNotFound() throws TodoNotFoundException {
         when(repositoryMock.findOne(TodoTestUtil.ID)).thenReturn(null);
 
         service.deleteById(TodoTestUtil.ID);
@@ -89,7 +89,7 @@ public class RepositoryTodoServiceTest {
     }
 
     @Test
-    public void findById() throws ToDoNotFoundException {
+    public void findById() throws TodoNotFoundException {
         Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
         when(repositoryMock.findOne(TodoTestUtil.ID)).thenReturn(model);
 
@@ -101,8 +101,8 @@ public class RepositoryTodoServiceTest {
         assertEquals(model, actual);
     }
 
-    @Test(expected = ToDoNotFoundException.class)
-    public void findByIdWhenToDoIsNotFound() throws ToDoNotFoundException {
+    @Test(expected = TodoNotFoundException.class)
+    public void findByIdWhenToDoIsNotFound() throws TodoNotFoundException {
         when(repositoryMock.findOne(TodoTestUtil.ID)).thenReturn(null);
 
         service.findById(TodoTestUtil.ID);
@@ -112,7 +112,7 @@ public class RepositoryTodoServiceTest {
     }
 
     @Test
-    public void update() throws ToDoNotFoundException {
+    public void update() throws TodoNotFoundException {
         TodoDTO dto = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
         Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
         when(repositoryMock.findOne(dto.getId())).thenReturn(model);
@@ -127,8 +127,8 @@ public class RepositoryTodoServiceTest {
         assertEquals(dto.getTitle(), actual.getTitle());
     }
 
-    @Test(expected = ToDoNotFoundException.class)
-    public void updateWhenToDoIsNotFound() throws ToDoNotFoundException {
+    @Test(expected = TodoNotFoundException.class)
+    public void updateWhenToDoIsNotFound() throws TodoNotFoundException {
         TodoDTO dto = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
         when(repositoryMock.findOne(dto.getId())).thenReturn(null);
 
