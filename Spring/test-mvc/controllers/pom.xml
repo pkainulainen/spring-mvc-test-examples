@@ -92,6 +92,20 @@
                             </sources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>add-integration-test-resources</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>add-test-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/integration-test/resources</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <!-- Used for unit tests -->
@@ -112,25 +126,20 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.12</version>
                 <executions>
+                    <!-- States that both integration-test and verify goals of the Failsafe Maven plugin are executed. -->
                     <execution>
                         <id>integration-tests</id>
-                        <phase>integration-test</phase>
                         <goals>
                             <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <!-- Skips integration tests if the value of skip.integration.tests property is true -->
                             <skipTests>${skip.integration.tests}</skipTests>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>verify</id>
-                        <goals>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -427,7 +436,6 @@
             <groupId>org.dbunit</groupId>
             <artifactId>dbunit</artifactId>
             <version>2.4.8</version>
-            <type>jar</type>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
