@@ -14,5 +14,5 @@ RUNNING THE APPLICATION:
 RUNNING TESTS:
 
 - You can run unit tests by using this command: mvn test -P dev
-- You can run integration tests by using this command: mvn integration-test -P integration-test
+- You can run integration tests by using this command: mvn verify -P integration-test
 
