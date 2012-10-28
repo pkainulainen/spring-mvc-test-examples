@@ -106,7 +106,7 @@ public class ITAnnotationTodoControllerTest {
 
     @Test
     @ExpectedDatabase("toDoData.xml")
-    public void deteByIdWhenToDoIsNotFound() throws Exception {
+    public void deleteByIdWhenToDoIsNotFound() throws Exception {
         mockMvc.perform(get("/todo/delete/{id}", 3L))
                 .andExpect(status().isNotFound())
                 .andExpect(view().name(ErrorController.VIEW_NOT_FOUND))
