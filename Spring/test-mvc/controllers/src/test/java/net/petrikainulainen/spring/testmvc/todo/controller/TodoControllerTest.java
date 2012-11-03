@@ -70,7 +70,7 @@ public class TodoControllerTest {
     public void showAddToDoForm() {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
-        String view = controller.showAddToDoForm(model);
+        String view = controller.showAddTodoForm(model);
 
         verifyZeroInteractions(messageSourceMock, serviceMock);
         assertEquals(TodoController.VIEW_TODO_ADD, view);
@@ -233,7 +233,7 @@ public class TodoControllerTest {
         Todo updated = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
         when(serviceMock.findById(TodoTestUtil.ID)).thenReturn(updated);
 
-        String view = controller.showUpdateToDoForm(TodoTestUtil.ID, model);
+        String view = controller.showUpdateTodoForm(TodoTestUtil.ID, model);
 
         verify(serviceMock, times(1)).findById(TodoTestUtil.ID);
         verifyNoMoreInteractions(serviceMock);
@@ -254,7 +254,7 @@ public class TodoControllerTest {
 
         when(serviceMock.findById(TodoTestUtil.ID)).thenThrow(new TodoNotFoundException(""));
 
-        controller.showUpdateToDoForm(TodoTestUtil.ID, model);
+        controller.showUpdateTodoForm(TodoTestUtil.ID, model);
 
         verify(serviceMock, times(1)).findById(TodoTestUtil.ID);
         verifyNoMoreInteractions(serviceMock);

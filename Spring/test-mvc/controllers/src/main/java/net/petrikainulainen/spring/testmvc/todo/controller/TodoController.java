@@ -55,7 +55,7 @@ public class TodoController {
     private MessageSource messageSource;
 
     @RequestMapping(value = "/todo/add", method = RequestMethod.GET)
-    public String showAddToDoForm(Model model) {
+    public String showAddTodoForm(Model model) {
         LOGGER.debug("Rendering add to-do entry form.");
 
         TodoDTO formObject = new TodoDTO();
@@ -119,7 +119,7 @@ public class TodoController {
     }
 
     @RequestMapping(value = "/todo/update/{id}", method = RequestMethod.GET)
-    public String showUpdateToDoForm(@PathVariable("id") Long id, Model model) throws TodoNotFoundException {
+    public String showUpdateTodoForm(@PathVariable("id") Long id, Model model) throws TodoNotFoundException {
         LOGGER.debug("Rendering update to-do entry form for to-do entry with id: {}", id);
 
         Todo updated = service.findById(id);
