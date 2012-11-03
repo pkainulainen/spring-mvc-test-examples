@@ -67,7 +67,7 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void showAddToDoForm() {
+    public void showAddTodoForm() {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
         String view = controller.showAddTodoForm(model);
@@ -227,7 +227,7 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void showUpdateToDoForm() throws TodoNotFoundException {
+    public void showUpdateTodoForm() throws TodoNotFoundException {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
         Todo updated = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
@@ -249,7 +249,7 @@ public class TodoControllerTest {
     }
 
     @Test(expected = TodoNotFoundException.class)
-    public void showUpdateToDoFormWhenToDoIsNotFound() throws TodoNotFoundException {
+    public void showUpdateTodoFormWhenToDoIsNotFound() throws TodoNotFoundException {
         BindingAwareModelMap model = new BindingAwareModelMap();
 
         when(serviceMock.findById(TodoTestUtil.ID)).thenThrow(new TodoNotFoundException(""));
