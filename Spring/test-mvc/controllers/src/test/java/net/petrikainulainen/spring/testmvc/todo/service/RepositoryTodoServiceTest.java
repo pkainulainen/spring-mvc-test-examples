@@ -36,7 +36,7 @@ public class RepositoryTodoServiceTest {
 
     @Test
     public void add() {
-        TodoDTO dto = TodoTestUtil.createDTO(null, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
+        TodoDTO dto = TodoTestUtil.createFormObject(null, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
 
         service.add(dto);
 
@@ -113,7 +113,7 @@ public class RepositoryTodoServiceTest {
 
     @Test
     public void update() throws TodoNotFoundException {
-        TodoDTO dto = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
+        TodoDTO dto = TodoTestUtil.createFormObject(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
         Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
         when(repositoryMock.findOne(dto.getId())).thenReturn(model);
 
@@ -129,7 +129,7 @@ public class RepositoryTodoServiceTest {
 
     @Test(expected = TodoNotFoundException.class)
     public void updateWhenToDoIsNotFound() throws TodoNotFoundException {
-        TodoDTO dto = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
+        TodoDTO dto = TodoTestUtil.createFormObject(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
         when(repositoryMock.findOne(dto.getId())).thenReturn(null);
 
         service.update(dto);

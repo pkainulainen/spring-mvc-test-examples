@@ -84,7 +84,7 @@ public class TodoControllerTest {
 
     @Test
     public void add() {
-        TodoDTO formObject = TodoTestUtil.createDTO(null, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
+        TodoDTO formObject = TodoTestUtil.createFormObject(null, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
 
         Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION, TodoTestUtil.TITLE);
         when(serviceMock.add(formObject)).thenReturn(model);
@@ -111,7 +111,7 @@ public class TodoControllerTest {
 
     @Test
     public void addEmptyTodo() {
-        TodoDTO formObject = TodoTestUtil.createDTO(null, "", "");
+        TodoDTO formObject = TodoTestUtil.createFormObject(null, "", "");
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
         BindingResult result = bindAndValidate(mockRequest, formObject);
@@ -131,7 +131,7 @@ public class TodoControllerTest {
         String description = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
         String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
 
-        TodoDTO formObject = TodoTestUtil.createDTO(null, description, title);
+        TodoDTO formObject = TodoTestUtil.createFormObject(null, description, title);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
         BindingResult result = bindAndValidate(mockRequest, formObject);
@@ -263,7 +263,7 @@ public class TodoControllerTest {
 
     @Test
     public void update() throws TodoNotFoundException {
-        TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
+        TodoDTO formObject = TodoTestUtil.createFormObject(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
 
         Todo model = TodoTestUtil.createModel(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
         when(serviceMock.update(formObject)).thenReturn(model);
@@ -290,7 +290,7 @@ public class TodoControllerTest {
 
     @Test
     public void updateEmptyToDo() throws TodoNotFoundException {
-        TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, "", "");
+        TodoDTO formObject = TodoTestUtil.createFormObject(TodoTestUtil.ID, "", "");
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
         BindingResult result = bindAndValidate(mockRequest, formObject);
@@ -310,7 +310,7 @@ public class TodoControllerTest {
         String description = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
         String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
 
-        TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, description, title);
+        TodoDTO formObject = TodoTestUtil.createFormObject(TodoTestUtil.ID, description, title);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest("POST", "/todo/add");
         BindingResult result = bindAndValidate(mockRequest, formObject);
@@ -327,7 +327,7 @@ public class TodoControllerTest {
 
     @Test(expected = TodoNotFoundException.class)
     public void updateWhenToDoIsNotFound() throws TodoNotFoundException {
-        TodoDTO formObject = TodoTestUtil.createDTO(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
+        TodoDTO formObject = TodoTestUtil.createFormObject(TodoTestUtil.ID, TodoTestUtil.DESCRIPTION_UPDATED, TodoTestUtil.TITLE_UPDATED);
 
         when(serviceMock.update(formObject)).thenThrow(new TodoNotFoundException(""));
 

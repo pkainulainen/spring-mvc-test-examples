@@ -17,7 +17,7 @@ public class TodoTestUtil {
 
     private static final String CHARACTER = "a";
 
-    public static TodoDTO createDTO(Long id, String description, String title) {
+    public static TodoDTO createFormObject(Long id, String description, String title) {
         TodoDTO dto = new TodoDTO();
 
         dto.setId(id);
@@ -44,7 +44,7 @@ public class TodoTestUtil {
         return redirectViewPath.toString();
     }
 
-    public static final String createStringWithLength(int length) {
+    public static String createStringWithLength(int length) {
         StringBuilder builder = new StringBuilder();
 
         for (int index = 0; index < length; index++) {
