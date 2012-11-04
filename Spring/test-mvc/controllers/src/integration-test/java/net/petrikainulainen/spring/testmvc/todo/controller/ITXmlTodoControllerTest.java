@@ -271,4 +271,20 @@ public class ITXmlTodoControllerTest {
                 .andExpect(model().attribute(TodoController.PARAMETER_TODO_ID, is("1")))
                 .andExpect(flash().attribute(TodoController.FLASH_MESSAGE_KEY_FEEDBACK, is("Todo entry: title was updated.")));
     }
+
+
+    @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void updateTodoWhenTodoIsNotFound() throws Exception {
+        TodoDTO formObject = TodoTestUtil.createFormObject(3L, "description", "title");
+
+        mockMvc.perform(post("/todo/update")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(IntegrationTestUtil.convertObjectToFormUrlEncodedBytes(formObject))
+                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, formObject)
+        )
+                .andExpect(status().isNotFound())
+                .andExpect(view().name(ErrorController.VIEW_NOT_FOUND))
+                .andExpect(forwardedUrl("/WEB-INF/jsp/error/404.jsp"));
+    }
 }
