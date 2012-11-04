@@ -15,22 +15,22 @@ public class IntegrationTestUtil {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
 
-        Map<String, Object> values = mapper.convertValue(object, Map.class);
+        Map<String, Object> propertyValues = mapper.convertValue(object, Map.class);
 
-        Set<String> keys = values.keySet();
-        Iterator<String> keyIter = keys.iterator();
+        Set<String> propertyNames = propertyValues.keySet();
+        Iterator<String> nameIter = propertyNames.iterator();
 
         StringBuilder formUrlEncoded = new StringBuilder();
 
-        for (int index=0; index < keys.size(); index++) {
-            String currentKey = keyIter.next();
-            Object currentValue = values.get(currentKey);
+        for (int index=0; index < propertyNames.size(); index++) {
+            String currentKey = nameIter.next();
+            Object currentValue = propertyValues.get(currentKey);
 
             formUrlEncoded.append(currentKey);
             formUrlEncoded.append("=");
             formUrlEncoded.append(currentValue);
 
-            if (keyIter.hasNext()) {
+            if (nameIter.hasNext()) {
                 formUrlEncoded.append("&");
             }
         }
