@@ -3,6 +3,8 @@ package net.petrikainulainen.spring.testmvc.todo.controller;
 import net.petrikainulainen.spring.testmvc.common.util.LocaleContextHolderWrapper;
 import net.petrikainulainen.spring.testmvc.todo.TodoTestUtil;
 import net.petrikainulainen.spring.testmvc.todo.config.UnitTestContext;
+import net.petrikainulainen.spring.testmvc.todo.dto.FieldValidationErrorDTO;
+import net.petrikainulainen.spring.testmvc.todo.dto.FormValidationErrorDTO;
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
 import net.petrikainulainen.spring.testmvc.todo.exception.FormValidationError;
 import net.petrikainulainen.spring.testmvc.todo.exception.TodoNotFoundException;
@@ -15,14 +17,17 @@ import org.springframework.context.MessageSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.Validator;
 
 import javax.annotation.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
 
 /**
@@ -32,9 +37,18 @@ import static org.mockito.Mockito.*;
 @ContextConfiguration(classes = {UnitTestContext.class})
 public class TodoControllerTest {
 
-    private static final String FEEDBACK_MESSAGE = "feedbackMessage";
+    private static final String ERROR_MESSAGE_CODE_EMPTY_TITLE = "NotEmpty.title";
+    private static final String ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE = "NotEmpty.todo.title";
+    private static final String ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION = "Length.todo.description";
+
+    private static final String ERROR_MESSAGE_EMPTY_TODO_TITLE = "Title cannot be empty.";
+    private static final String ERROR_MESSAGE_TOO_LONG_DESCRIPTION = "The maximum length of the description is 500 characters.";
+
     private static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_TITLE = "title";
+
+    private static final String OBJECT_NAME = "todo";
+
 
     private TodoController controller;
 
@@ -233,9 +247,173 @@ public class TodoControllerTest {
         verifyZeroInteractions(localeHolderWrapperMock, messageSourceMock);
     }
 
+    @Test
+    public void handleFormValidationError() {
+        FieldError titleError = createFieldError(OBJECT_NAME, FIELD_TITLE, ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE);
+        FieldError descriptionError = createFieldError(OBJECT_NAME, FIELD_DESCRIPTION, ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION);
+
+        List<FieldError> errors = new ArrayList<FieldError>();
+        errors.add(titleError);
+        errors.add(descriptionError);
+
+        FormValidationError validationError = new FormValidationError(errors);
+
+        when(localeHolderWrapperMock.getCurrentLocale()).thenReturn(Locale.US);
+
+        when(messageSourceMock.getMessage(ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE, titleError.getArguments(), Locale.US)).thenReturn(ERROR_MESSAGE_EMPTY_TODO_TITLE);
+        when(messageSourceMock.getMessage(ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION, descriptionError.getArguments(), Locale.US)).thenReturn(ERROR_MESSAGE_TOO_LONG_DESCRIPTION);
+
+        FormValidationErrorDTO dto = controller.handleFormValidationError(validationError);
+
+        verify(localeHolderWrapperMock, times(1)).getCurrentLocale();
+        verifyNoMoreInteractions(localeHolderWrapperMock);
+
+        verify(messageSourceMock, times(1)).getMessage(ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE, titleError.getArguments(), Locale.US);
+        verify(messageSourceMock, times(1)).getMessage(ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION, descriptionError.getArguments(), Locale.US);
+        verifyNoMoreInteractions(messageSourceMock);
+
+        verifyZeroInteractions(serviceMock);
+
+        List<FieldValidationErrorDTO> fieldErrorDTOs = dto.getFieldErrors();
+
+        assertEquals(2, fieldErrorDTOs.size());
+
+        FieldValidationErrorDTO titleFieldErrorDTO = fieldErrorDTOs.get(0);
+        assertEquals(FIELD_TITLE, titleFieldErrorDTO.getPath());
+        assertEquals(ERROR_MESSAGE_EMPTY_TODO_TITLE, titleFieldErrorDTO.getMessage());
+
+        FieldValidationErrorDTO descriptionFieldErrorDTO = fieldErrorDTOs.get(1);
+        assertEquals(FIELD_DESCRIPTION, descriptionFieldErrorDTO.getPath());
+        assertEquals(ERROR_MESSAGE_TOO_LONG_DESCRIPTION, descriptionFieldErrorDTO.getMessage());
+    }
+
+    @Test
+    public void handleFormValidationErrorWhenErrorMessageIsNotFoundWithFirstErrorCode() {
+        FieldError titleError = createFieldError(OBJECT_NAME, FIELD_TITLE, ERROR_MESSAGE_CODE_EMPTY_TITLE, ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE);
+
+        List<FieldError> errors = new ArrayList<FieldError>();
+        errors.add(titleError);
+
+        FormValidationError validationError = new FormValidationError(errors);
+
+        when(localeHolderWrapperMock.getCurrentLocale()).thenReturn(Locale.US);
+
+        when(messageSourceMock.getMessage(ERROR_MESSAGE_CODE_EMPTY_TITLE, titleError.getArguments(), Locale.US)).thenReturn(ERROR_MESSAGE_CODE_EMPTY_TITLE);
+        when(messageSourceMock.getMessage(ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE, titleError.getArguments(), Locale.US)).thenReturn(ERROR_MESSAGE_EMPTY_TODO_TITLE);
+
+        FormValidationErrorDTO dto = controller.handleFormValidationError(validationError);
+
+        verify(localeHolderWrapperMock, times(1)).getCurrentLocale();
+        verifyNoMoreInteractions(localeHolderWrapperMock);
+
+        verify(messageSourceMock, times(1)).getMessage(ERROR_MESSAGE_CODE_EMPTY_TITLE, titleError.getArguments(), Locale.US);
+        verify(messageSourceMock, times(1)).getMessage(ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE, titleError.getArguments(), Locale.US);
+        verifyNoMoreInteractions(messageSourceMock);
+
+        verifyZeroInteractions(serviceMock);
+
+        List<FieldValidationErrorDTO> fieldErrorDTOs = dto.getFieldErrors();
+
+        assertEquals(1, fieldErrorDTOs.size());
+
+        FieldValidationErrorDTO titleFieldErrorDTO = fieldErrorDTOs.get(0);
+        assertEquals(FIELD_TITLE, titleFieldErrorDTO.getPath());
+        assertEquals(ERROR_MESSAGE_EMPTY_TODO_TITLE, titleFieldErrorDTO.getMessage());
+    }
+
+    @Test
+    public void handleFormValidationErrorWhenErrorMessagesAreNotFound() {
+        FieldError titleError = createFieldError(OBJECT_NAME, FIELD_TITLE, ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE);
+        FieldError descriptionError = createFieldError(OBJECT_NAME, FIELD_DESCRIPTION, ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION);
+
+        List<FieldError> errors = new ArrayList<FieldError>();
+        errors.add(titleError);
+        errors.add(descriptionError);
+
+        FormValidationError validationError = new FormValidationError(errors);
+
+        when(localeHolderWrapperMock.getCurrentLocale()).thenReturn(Locale.US);
+
+        when(messageSourceMock.getMessage(ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE, titleError.getArguments(), Locale.US)).thenReturn(ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE);
+        when(messageSourceMock.getMessage(ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION, descriptionError.getArguments(), Locale.US)).thenReturn(ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION);
+
+        FormValidationErrorDTO dto = controller.handleFormValidationError(validationError);
+
+        verify(localeHolderWrapperMock, times(1)).getCurrentLocale();
+        verifyNoMoreInteractions(localeHolderWrapperMock);
+
+        verify(messageSourceMock, times(1)).getMessage(ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE, titleError.getArguments(), Locale.US);
+        verify(messageSourceMock, times(1)).getMessage(ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION, descriptionError.getArguments(), Locale.US);
+        verifyNoMoreInteractions(messageSourceMock);
+
+        verifyZeroInteractions(serviceMock);
+
+        List<FieldValidationErrorDTO> fieldErrorDTOs = dto.getFieldErrors();
+
+        assertEquals(2, fieldErrorDTOs.size());
+
+        FieldValidationErrorDTO titleFieldErrorDTO = fieldErrorDTOs.get(0);
+        assertEquals(FIELD_TITLE, titleFieldErrorDTO.getPath());
+        assertEquals(ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE, titleFieldErrorDTO.getMessage());
+
+        FieldValidationErrorDTO descriptionFieldErrorDTO = fieldErrorDTOs.get(1);
+        assertEquals(FIELD_DESCRIPTION, descriptionFieldErrorDTO.getPath());
+        assertEquals(ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION, descriptionFieldErrorDTO.getMessage());
+    }
+
+    @Test
+    public void handleFormValidationErrorWhenErrorMessagesAreNull() {
+        FieldError titleError = createFieldError(OBJECT_NAME, FIELD_TITLE, ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE);
+        FieldError descriptionError = createFieldError(OBJECT_NAME, FIELD_DESCRIPTION, ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION);
+
+        List<FieldError> errors = new ArrayList<FieldError>();
+        errors.add(titleError);
+        errors.add(descriptionError);
+
+        FormValidationError validationError = new FormValidationError(errors);
+
+        when(localeHolderWrapperMock.getCurrentLocale()).thenReturn(Locale.US);
+
+        when(messageSourceMock.getMessage(ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE, titleError.getArguments(), Locale.US)).thenReturn(null);
+        when(messageSourceMock.getMessage(ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION, descriptionError.getArguments(), Locale.US)).thenReturn(null);
+
+        FormValidationErrorDTO dto = controller.handleFormValidationError(validationError);
+
+        verify(localeHolderWrapperMock, times(1)).getCurrentLocale();
+        verifyNoMoreInteractions(localeHolderWrapperMock);
+
+        verify(messageSourceMock, times(1)).getMessage(ERROR_MESSAGE_CODE_EMPTY_TODO_TITLE, titleError.getArguments(), Locale.US);
+        verify(messageSourceMock, times(1)).getMessage(ERROR_MESSAGE_CODE_TOO_LONG_DESCRIPTION, descriptionError.getArguments(), Locale.US);
+        verifyNoMoreInteractions(messageSourceMock);
+
+        verifyZeroInteractions(serviceMock);
+
+        List<FieldValidationErrorDTO> fieldErrorDTOs = dto.getFieldErrors();
+
+        assertEquals(2, fieldErrorDTOs.size());
+
+        FieldValidationErrorDTO titleFieldErrorDTO = fieldErrorDTOs.get(0);
+        assertEquals(FIELD_TITLE, titleFieldErrorDTO.getPath());
+        assertNull(titleFieldErrorDTO.getMessage());
+
+        FieldValidationErrorDTO descriptionFieldErrorDTO = fieldErrorDTOs.get(1);
+        assertEquals(FIELD_DESCRIPTION, descriptionFieldErrorDTO.getPath());
+        assertNull(descriptionFieldErrorDTO.getMessage());
+    }
+
     private void assertTodo(Todo expected, TodoDTO actual) {
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getTitle(), actual.getTitle());
+    }
+
+    public FieldError createFieldError(String objectName, String path, String... errorMessageCodes) {
+        return new FieldError(objectName,
+                path,
+                null,
+                false,
+                errorMessageCodes,
+                new Object[]{},
+                errorMessageCodes[0]);
     }
 }
