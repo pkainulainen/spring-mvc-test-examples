@@ -104,7 +104,7 @@ public class TodoController {
         return createDTO(found);
     }
 
-    @RequestMapping(value = "/todo/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/todo/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public TodoDTO update(@RequestBody TodoDTO dto, @PathVariable("id") Long todoId) throws TodoNotFoundException, FormValidationError {
         LOGGER.debug("Updating a to-do entry with information: {}", dto);
