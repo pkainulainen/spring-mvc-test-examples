@@ -20,7 +20,7 @@ import java.util.Properties;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = {
-        "net.petrikainulainen.spring.testmvc.common.util",
+        "net.petrikainulainen.spring.testmvc.common",
         "net.petrikainulainen.spring.testmvc.todo.controller",
         "net.petrikainulainen.spring.testmvc.todo.service"
 })
@@ -29,6 +29,9 @@ import java.util.Properties;
 public class ExampleApplicationContext extends WebMvcConfigurerAdapter {
 
     private static final String MESSAGE_SOURCE_BASE_NAME = "i18n/messages";
+
+    private static final String VIEW_RESOLVER_PREFIX = "/WEB-INF/jsp/";
+    private static final String VIEW_RESOLVER_SUFFIX = ".jsp";
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -48,5 +51,16 @@ public class ExampleApplicationContext extends WebMvcConfigurerAdapter {
         messageSource.setUseCodeAsDefaultMessage(true);
 
         return messageSource;
+    }
+
+    @Bean
+    public ViewResolver viewResolver() {
+        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+
+        viewResolver.setViewClass(JstlView.class);
+        viewResolver.setPrefix(VIEW_RESOLVER_PREFIX);
+        viewResolver.setSuffix(VIEW_RESOLVER_SUFFIX);
+
+        return viewResolver;
     }
 }
