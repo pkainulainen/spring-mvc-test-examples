@@ -48,7 +48,7 @@ public class TodoController {
     private Validator validator;
 
 
-    @RequestMapping(value = "/todo", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/todo", method = RequestMethod.POST)
     @ResponseBody
     public TodoDTO add(@RequestBody TodoDTO dto) throws FormValidationError {
         LOGGER.debug("Adding a new to-do entry with information: {}", dto);
@@ -61,7 +61,7 @@ public class TodoController {
        return createDTO(added);
     }
 
-    @RequestMapping(value = "/todo/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/todo/{id}", method = RequestMethod.DELETE)
     @ResponseBody
     public TodoDTO deleteById(@PathVariable("id") Long id) throws TodoNotFoundException {
         LOGGER.debug("Deleting a to-do entry with id: {}", id);
@@ -72,7 +72,7 @@ public class TodoController {
         return createDTO(deleted);
     }
 
-    @RequestMapping(value = "/todo", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/todo", method = RequestMethod.GET)
     @ResponseBody
     public List<TodoDTO> findAll() {
         LOGGER.debug("Finding all todo entries.");
@@ -93,7 +93,7 @@ public class TodoController {
         return dtos;
     }
 
-    @RequestMapping(value = "/todo/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/todo/{id}", method = RequestMethod.GET)
     @ResponseBody
     public TodoDTO findById(@PathVariable("id") Long id) throws TodoNotFoundException {
         LOGGER.debug("Finding to-do entry with id: {}", id);
@@ -104,7 +104,7 @@ public class TodoController {
         return createDTO(found);
     }
 
-    @RequestMapping(value = "/todo/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/todo/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public TodoDTO update(@RequestBody TodoDTO dto, @PathVariable("id") Long todoId) throws TodoNotFoundException, FormValidationError {
         LOGGER.debug("Updating a to-do entry with information: {}", dto);

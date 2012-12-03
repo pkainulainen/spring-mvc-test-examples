@@ -59,7 +59,7 @@ public class ITXmlTodoControllerTest {
     @ExpectedDatabase(value="toDoData-add-expected.xml", assertionMode = DatabaseAssertionMode.NON_STRICT)
     public void add() throws Exception {
         TodoDTO added = TodoTestUtil.createDTO(null, "description", "title");
-        mockMvc.perform(post("/todo")
+        mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
         )
@@ -72,7 +72,7 @@ public class ITXmlTodoControllerTest {
     @ExpectedDatabase("toDoData.xml")
     public void addEmptyTodo() throws Exception {
         TodoDTO added = TodoTestUtil.createDTO(null, "", "");
-        mockMvc.perform(post("/todo")
+        mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
         )
@@ -88,7 +88,7 @@ public class ITXmlTodoControllerTest {
         String description = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
         TodoDTO added = TodoTestUtil.createDTO(null, description, title);
 
-        mockMvc.perform(post("/todo")
+        mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
         )
@@ -105,7 +105,7 @@ public class ITXmlTodoControllerTest {
     @Test
     @ExpectedDatabase("toDoData-delete-expected.xml")
     public void deleteById() throws Exception {
-        mockMvc.perform(delete("/todo/{id}", 1L))
+        mockMvc.perform(delete("/api/todo/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(content().string("{\"id\":1,\"description\":\"Lorem ipsum\",\"title\":\"Foo\"}"));
@@ -114,14 +114,14 @@ public class ITXmlTodoControllerTest {
     @Test
     @ExpectedDatabase("toDoData.xml")
     public void deleteByIdWhenTodoIsNotFound() throws Exception {
-        mockMvc.perform(delete("/todo/{id}", 3L))
+        mockMvc.perform(delete("/api/todo/{id}", 3L))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @ExpectedDatabase("toDoData.xml")
     public void findAll() throws Exception {
-        mockMvc.perform(get("/todo"))
+        mockMvc.perform(get("/api/todo"))
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(content().string("[{\"id\":1,\"description\":\"Lorem ipsum\",\"title\":\"Foo\"},{\"id\":2,\"description\":\"Lorem ipsum\",\"title\":\"Bar\"}]"));
@@ -130,7 +130,7 @@ public class ITXmlTodoControllerTest {
     @Test
     @ExpectedDatabase("toDoData.xml")
     public void findById() throws Exception {
-        mockMvc.perform(get("/todo/{id}", 1L))
+        mockMvc.perform(get("/api/todo/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(content().string("{\"id\":1,\"description\":\"Lorem ipsum\",\"title\":\"Foo\"}"));
@@ -139,7 +139,7 @@ public class ITXmlTodoControllerTest {
     @Test
     @ExpectedDatabase("toDoData.xml")
     public void findByIdWhenTodoIsNotFound() throws Exception {
-        mockMvc.perform(get("/todo/{id}", 3L))
+        mockMvc.perform(get("/api/todo/{id}", 3L))
                 .andExpect(status().isNotFound());
     }
 
@@ -148,7 +148,7 @@ public class ITXmlTodoControllerTest {
     public void update() throws Exception {
         TodoDTO updated = TodoTestUtil.createDTO(1L, "description", "title");
 
-        mockMvc.perform(put("/todo/{id}", 1L)
+        mockMvc.perform(put("/api/todo/{id}", 1L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
         )
@@ -162,7 +162,7 @@ public class ITXmlTodoControllerTest {
     public void updateEmptyTodo() throws Exception {
         TodoDTO updated = TodoTestUtil.createDTO(1L, "", "");
 
-        mockMvc.perform(put("/todo/{id}", 1L)
+        mockMvc.perform(put("/api/todo/{id}", 1L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
         )
@@ -179,7 +179,7 @@ public class ITXmlTodoControllerTest {
 
         TodoDTO updated = TodoTestUtil.createDTO(1L, description, title);
 
-        mockMvc.perform(put("/todo/{id}", 1L)
+        mockMvc.perform(put("/api/todo/{id}", 1L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
         )
@@ -198,7 +198,7 @@ public class ITXmlTodoControllerTest {
     public void updateTodoWhenTodoIsNotFound() throws Exception {
         TodoDTO updated = TodoTestUtil.createDTO(3L, "description", "title");
 
-        mockMvc.perform(put("/todo/{id}", 3L)
+        mockMvc.perform(put("/api/todo/{id}", 3L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
         )
