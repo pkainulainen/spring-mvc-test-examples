@@ -31,8 +31,6 @@ public class TodoController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TodoController.class);
 
-    protected static final String ERROR_MESSAGE_CODE_VALIDATION_ERROR = "error.message.validation.error";
-
     protected static final String OBJECT_NAME_TODO = "todo";
 
     @Resource
