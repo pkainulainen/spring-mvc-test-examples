@@ -1,6 +1,5 @@
 package net.petrikainulainen.spring.testmvc.config;
 
-import org.sitemesh.config.ConfigurableSiteMeshFilter;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -29,10 +28,6 @@ public class ExampleApplicationConfig implements WebApplicationInitializer {
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet(DISPATCHER_SERVLET_NAME, new DispatcherServlet(rootContext));
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping(DISPATCHER_SERVLET_MAPPING);
-
-        FilterRegistration.Dynamic sitemesh = servletContext.addFilter("sitemesh", new ConfigurableSiteMeshFilter());
-        EnumSet<DispatcherType> sitemeshDispatcherTypes = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD);
-        sitemesh.addMappingForUrlPatterns(sitemeshDispatcherTypes, true, "*.jsp");
 
         servletContext.addListener(new ContextLoaderListener(rootContext));
     }
