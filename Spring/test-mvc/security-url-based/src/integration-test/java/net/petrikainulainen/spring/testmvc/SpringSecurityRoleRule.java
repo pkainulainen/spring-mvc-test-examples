@@ -3,6 +3,7 @@ package net.petrikainulainen.spring.testmvc;
 import org.junit.rules.ExternalResource;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.server.MockMvc;
 
+import javax.persistence.metamodel.ListAttribute;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -66,17 +68,17 @@ public class SpringSecurityRoleRule extends ExternalResource {
         }
 
         private Authentication createAuthentication(SecurityRole roleConfiguration) {
-            UserDetails principal = createPrincipal(roleConfiguration.value());
-            return createAuthentication(principal);
+            List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roleConfiguration.value());
+            UserDetails principal = createPrincipal(authorities);
+            return createAuthentication(principal, authorities);
         }
 
-        private UserDetails createPrincipal(String role) {
-            List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(role);
+        private UserDetails createPrincipal(List<GrantedAuthority> authorities ) {
             return new User(USERNAME, PASSWORD, authorities);
         }
 
-        private Authentication createAuthentication(UserDetails principal) {
-            return new UsernamePasswordAuthenticationToken(principal, USERNAME, principal.getAuthorities());
+        private Authentication createAuthentication(UserDetails principal, List<GrantedAuthority> authorities) {
+            return new TestingAuthenticationToken(principal, USERNAME, authorities);
         }
 
         private void injectAuthenticationToTest(Authentication authentication) {
@@ -88,7 +90,7 @@ public class SpringSecurityRoleRule extends ExternalResource {
                         currentField.setAccessible(true);
                         currentField.set(test, authentication);
                     } catch (IllegalAccessException e) {
-                        throw new RuntimeException("The MockMvc object could not be injected to field: " + currentField.getName());
+                        throw new RuntimeException("The Authentication object could not be injected to field: " + currentField.getName());
                     }
                     break;
                 }
