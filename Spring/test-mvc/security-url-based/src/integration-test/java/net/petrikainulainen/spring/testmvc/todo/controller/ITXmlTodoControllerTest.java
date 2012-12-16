@@ -35,6 +35,7 @@ import static org.springframework.test.web.server.request.MockMvcRequestBuilders
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.server.samples.context.SecurityRequestPostProcessors.userDetailsService;
 
 /**
  * This test uses the xml based application context configuration.
@@ -60,9 +61,6 @@ public class ITXmlTodoControllerTest {
 
     private MockMvc mockMvc;
 
-    @Rule
-    public SpringSecurityRoleRule roleRule = new SpringSecurityRoleRule(this);
-
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webApplicationContextSetup(webApplicationContext)
@@ -71,13 +69,13 @@ public class ITXmlTodoControllerTest {
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase(value="toDoData-add-expected.xml", assertionMode = DatabaseAssertionMode.NON_STRICT)
     public void add() throws Exception {
         TodoDTO added = TodoTestUtil.createDTO(null, "description", "title");
         mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
+                .with(userDetailsService("user"))
         )
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -85,13 +83,13 @@ public class ITXmlTodoControllerTest {
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData.xml")
     public void addEmptyTodo() throws Exception {
         TodoDTO added = TodoTestUtil.createDTO(null, "", "");
         mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
+                .with(userDetailsService("user"))
         )
                 .andExpect(status().isBadRequest())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -99,7 +97,6 @@ public class ITXmlTodoControllerTest {
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData.xml")
     public void addTodoWhenTitleAndDescriptionAreTooLong() throws Exception {
         String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
@@ -109,6 +106,7 @@ public class ITXmlTodoControllerTest {
         mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
+                .with(userDetailsService("user"))
         )
                 .andExpect(status().isBadRequest())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -121,38 +119,42 @@ public class ITXmlTodoControllerTest {
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData-delete-expected.xml")
     public void deleteById() throws Exception {
-        mockMvc.perform(delete("/api/todo/{id}", 1L))
+        mockMvc.perform(delete("/api/todo/{id}", 1L)
+                .with(userDetailsService("user"))
+        )
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(content().string("{\"id\":1,\"description\":\"Lorem ipsum\",\"title\":\"Foo\"}"));
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData.xml")
     public void deleteByIdWhenTodoIsNotFound() throws Exception {
-        mockMvc.perform(delete("/api/todo/{id}", 3L))
+        mockMvc.perform(delete("/api/todo/{id}", 3L)
+                .with(userDetailsService("user"))
+        )
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData.xml")
     public void findAll() throws Exception {
-        mockMvc.perform(get("/api/todo"))
+        mockMvc.perform(get("/api/todo")
+                .with(userDetailsService("user"))
+        )
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(content().string("[{\"id\":1,\"description\":\"Lorem ipsum\",\"title\":\"Foo\"},{\"id\":2,\"description\":\"Lorem ipsum\",\"title\":\"Bar\"}]"));
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData.xml")
     public void findById() throws Exception {
-        mockMvc.perform(get("/api/todo/{id}", 1L))
+        mockMvc.perform(get("/api/todo/{id}", 1L)
+                .with(userDetailsService("user"))
+        )
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(content().string("{\"id\":1,\"description\":\"Lorem ipsum\",\"title\":\"Foo\"}"));
@@ -162,12 +164,13 @@ public class ITXmlTodoControllerTest {
     @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData.xml")
     public void findByIdWhenTodoIsNotFound() throws Exception {
-        mockMvc.perform(get("/api/todo/{id}", 3L))
+        mockMvc.perform(get("/api/todo/{id}", 3L)
+                .with(userDetailsService("user"))
+        )
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase(value="toDoData-update-expected.xml", assertionMode = DatabaseAssertionMode.NON_STRICT)
     public void update() throws Exception {
         TodoDTO updated = TodoTestUtil.createDTO(1L, "description", "title");
@@ -175,6 +178,7 @@ public class ITXmlTodoControllerTest {
         mockMvc.perform(put("/api/todo/{id}", 1L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
+                .with(userDetailsService("user"))
         )
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -182,7 +186,6 @@ public class ITXmlTodoControllerTest {
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData.xml")
     public void updateEmptyTodo() throws Exception {
         TodoDTO updated = TodoTestUtil.createDTO(1L, "", "");
@@ -190,6 +193,7 @@ public class ITXmlTodoControllerTest {
         mockMvc.perform(put("/api/todo/{id}", 1L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
+                .with(userDetailsService("user"))
         )
                 .andExpect(status().isBadRequest())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -197,7 +201,6 @@ public class ITXmlTodoControllerTest {
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData.xml")
     public void updateTodoWhenTitleAndDescriptionAreTooLong() throws Exception {
         String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
@@ -208,6 +211,7 @@ public class ITXmlTodoControllerTest {
         mockMvc.perform(put("/api/todo/{id}", 1L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
+                .with(userDetailsService("user"))
         )
                 .andExpect(status().isBadRequest())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -220,7 +224,6 @@ public class ITXmlTodoControllerTest {
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData.xml")
     public void updateTodoWhenTodoIsNotFound() throws Exception {
         TodoDTO updated = TodoTestUtil.createDTO(3L, "description", "title");
@@ -228,6 +231,7 @@ public class ITXmlTodoControllerTest {
         mockMvc.perform(put("/api/todo/{id}", 3L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
+                .with(userDetailsService("user"))
         )
                 .andExpect(status().isNotFound());
     }
