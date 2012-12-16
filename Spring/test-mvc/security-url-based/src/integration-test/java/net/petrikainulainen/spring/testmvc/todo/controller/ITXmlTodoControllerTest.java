@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -20,6 +21,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.web.server.MockMvc;
+import org.springframework.test.web.server.samples.context.WebContextLoader;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -39,7 +41,7 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.s
  * @author Petri Kainulainen
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:exampleApplicationContext.xml"})
+@ContextConfiguration(loader = WebContextLoader.class, locations = {"classpath:exampleApplicationContext.xml"})
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
@@ -59,7 +61,7 @@ public class ITXmlTodoControllerTest {
     private MockMvc mockMvc;
 
     @Rule
-    public SpringSecurityRoleRule roleRule = new SpringSecurityRoleRule();
+    public SpringSecurityRoleRule roleRule = new SpringSecurityRoleRule(this);
 
     @Before
     public void setUp() {

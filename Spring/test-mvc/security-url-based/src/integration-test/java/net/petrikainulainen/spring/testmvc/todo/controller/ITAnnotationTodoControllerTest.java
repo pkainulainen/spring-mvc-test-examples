@@ -22,6 +22,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.web.server.MockMvc;
+import org.springframework.test.web.server.samples.context.WebContextLoader;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -39,7 +40,7 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.s
  * @author Petri Kainulainen
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ExampleApplicationContext.class})
+@ContextConfiguration(loader = WebContextLoader.class, classes = {ExampleApplicationContext.class})
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
@@ -57,7 +58,7 @@ public class ITAnnotationTodoControllerTest {
     private DataSource datasource;
 
     @Rule
-    public SpringSecurityRoleRule roleRule = new SpringSecurityRoleRule();
+    public SpringSecurityRoleRule roleRule = new SpringSecurityRoleRule(this);
 
     private MockMvc mockMvc;
 

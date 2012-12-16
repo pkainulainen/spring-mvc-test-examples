@@ -10,7 +10,9 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.web.server.MockMvc;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -25,7 +27,10 @@ public class SpringSecurityRoleRule extends ExternalResource {
     private static final String USERNAME = "user";
     private static final String PASSWORD = "password";
 
-    public SpringSecurityRoleRule() {
+    private Object test;
+
+    public SpringSecurityRoleRule(Object test) {
+        this.test = test;
     }
 
     @Override
@@ -53,15 +58,16 @@ public class SpringSecurityRoleRule extends ExternalResource {
             SecurityRole roleConfiguration = description.getAnnotation(SecurityRole.class);
 
             if (roleConfiguration != null) {
-                setAuthenticationToSecurityContext(roleConfiguration);
+                Authentication authentication = createAuthentication(roleConfiguration);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                injectAuthenticationToTest(authentication);
             }
             statement.evaluate();
         }
 
-        private void setAuthenticationToSecurityContext(SecurityRole roleConfiguration) {
+        private Authentication createAuthentication(SecurityRole roleConfiguration) {
             UserDetails principal = createPrincipal(roleConfiguration.value());
-            Authentication authentication = createAuthentication(principal);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            return createAuthentication(principal);
         }
 
         private UserDetails createPrincipal(String role) {
@@ -71,6 +77,22 @@ public class SpringSecurityRoleRule extends ExternalResource {
 
         private Authentication createAuthentication(UserDetails principal) {
             return new UsernamePasswordAuthenticationToken(principal, USERNAME, principal.getAuthorities());
+        }
+
+        private void injectAuthenticationToTest(Authentication authentication) {
+            Class testClass = description.getTestClass();
+            Field[] fields = testClass.getDeclaredFields();
+            for (Field currentField: fields) {
+                if (currentField.getType().equals(Authentication.class)) {
+                    try {
+                        currentField.setAccessible(true);
+                        currentField.set(test, authentication);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException("The MockMvc object could not be injected to field: " + currentField.getName());
+                    }
+                    break;
+                }
+            }
         }
     }
 }
