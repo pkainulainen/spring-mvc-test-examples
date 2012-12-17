@@ -7,6 +7,7 @@ import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import net.petrikainulainen.spring.testmvc.IntegrationTestUtil;
 import net.petrikainulainen.spring.testmvc.SpringTestMvcRule;
 import net.petrikainulainen.spring.testmvc.ApplicationContextSetup;
+import net.petrikainulainen.spring.testmvc.config.ExampleApplicationContext;
 import net.petrikainulainen.spring.testmvc.config.IntegrationTestApplicationContext;
 import net.petrikainulainen.spring.testmvc.todo.TodoTestUtil;
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
@@ -26,18 +27,17 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.endsWith;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.server.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 
 /**
- * This test uses the xml based application context configuration.
+ * This test uses the annotation based application context configuration.
  * @author Petri Kainulainen
  */
-@ApplicationContextSetup(configurationFile = "classpath:exampleApplicationContext.xml")
+@ApplicationContextSetup(configurationClass = ExampleApplicationContext.class)
+//@ApplicationContextSetup(configurationFile = "classpath:exampleApplicationContext.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {IntegrationTestApplicationContext.class})
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
@@ -45,7 +45,7 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.s
         TransactionalTestExecutionListener.class,
         DbUnitTestExecutionListener.class })
 @DatabaseSetup("toDoData.xml")
-public class ITXmlTodoControllerTest {
+public class ITTodoControllerTest {
 
     @Resource
     private DataSource datasource;
@@ -205,3 +205,4 @@ public class ITXmlTodoControllerTest {
                 .andExpect(status().isNotFound());
     }
 }
+
