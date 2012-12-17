@@ -46,6 +46,7 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.*
  * @author Petri Kainulainen
  */
 @ApplicationContextSetup(configurationClass = ExampleApplicationContext.class)
+//@ApplicationContextSetup(configurationFile = "classpath:exampleApplicationContext.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {IntegrationTestApplicationContext.class})
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
@@ -53,7 +54,7 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.*
         TransactionalTestExecutionListener.class,
         DbUnitTestExecutionListener.class })
 @DatabaseSetup("toDoData.xml")
-public class ITAnnotationTodoControllerTest {
+public class ITTodoControllerTest {
 
     @Resource
     private DataSource datasource;
