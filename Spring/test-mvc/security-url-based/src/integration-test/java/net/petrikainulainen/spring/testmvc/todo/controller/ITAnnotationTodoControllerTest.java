@@ -6,12 +6,10 @@ import com.github.springtestdbunit.annotation.ExpectedDatabase;
 import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import net.petrikainulainen.spring.testmvc.*;
 import net.petrikainulainen.spring.testmvc.config.ExampleApplicationContext;
-import net.petrikainulainen.spring.testmvc.config.IntegrationTestApplicationContext;
 import net.petrikainulainen.spring.testmvc.todo.TodoTestUtil;
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
 import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.security.web.FilterChainProxy;
@@ -31,7 +29,6 @@ import javax.sql.DataSource;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.server.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.server.samples.context.SecurityRequestPostProcessors.userDetailsService;
@@ -68,8 +65,19 @@ public class ITAnnotationTodoControllerTest {
     }
 
     @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void addAsAnonymous() throws Exception {
+        TodoDTO added = TodoTestUtil.createDTO(null, "description", "title");
+        mockMvc.perform(post("/api/todo")
+                .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
+                .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
+        )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     @ExpectedDatabase(value="toDoData-add-expected.xml", assertionMode = DatabaseAssertionMode.NON_STRICT)
-    public void add() throws Exception {
+    public void addAsUser() throws Exception {
         TodoDTO added = TodoTestUtil.createDTO(null, "description", "title");
         mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
@@ -83,7 +91,18 @@ public class ITAnnotationTodoControllerTest {
 
     @Test
     @ExpectedDatabase("toDoData.xml")
-    public void addEmptyTodo() throws Exception {
+    public void addEmptyTodoAsAnonymous() throws Exception {
+        TodoDTO added = TodoTestUtil.createDTO(null, "", "");
+        mockMvc.perform(post("/api/todo")
+                .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
+                .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
+        )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void addEmptyTodoAsUser() throws Exception {
         TodoDTO added = TodoTestUtil.createDTO(null, "", "");
         mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
@@ -97,7 +116,21 @@ public class ITAnnotationTodoControllerTest {
 
     @Test
     @ExpectedDatabase("toDoData.xml")
-    public void addTodoWhenTitleAndDescriptionAreTooLong() throws Exception {
+    public void addTodoWhenTitleAndDescriptionAreTooLongAsAnonymous() throws Exception {
+        String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
+        String description = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
+        TodoDTO added = TodoTestUtil.createDTO(null, description, title);
+
+        mockMvc.perform(post("/api/todo")
+                .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
+                .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
+        )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void addTodoWhenTitleAndDescriptionAreTooLongAsUser() throws Exception {
         String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
         String description = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
         TodoDTO added = TodoTestUtil.createDTO(null, description, title);
@@ -118,8 +151,15 @@ public class ITAnnotationTodoControllerTest {
     }
 
     @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void deleteByIdAsAnonymous() throws Exception {
+        mockMvc.perform(delete("/api/todo/{id}", 1L))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     @ExpectedDatabase("toDoData-delete-expected.xml")
-    public void deleteById() throws Exception {
+    public void deleteByIdAsUser() throws Exception {
         mockMvc.perform(delete("/api/todo/{id}", 1L)
                 .with(userDetailsService("user"))
         )
@@ -130,7 +170,14 @@ public class ITAnnotationTodoControllerTest {
 
     @Test
     @ExpectedDatabase("toDoData.xml")
-    public void deleteByIdWhenTodoIsNotFound() throws Exception {
+    public void deleteByIdWhenTodoIsNotFoundAsAnonymous() throws Exception {
+        mockMvc.perform(delete("/api/todo/{id}", 3L))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void deleteByIdWhenTodoIsNotFoundAsUser() throws Exception {
         mockMvc.perform(delete("/api/todo/{id}", 3L)
                 .with(userDetailsService("user"))
         )
@@ -139,7 +186,14 @@ public class ITAnnotationTodoControllerTest {
 
     @Test
     @ExpectedDatabase("toDoData.xml")
-    public void findAll() throws Exception {
+    public void findAllAsAnonymous() throws Exception {
+        mockMvc.perform(get("/api/todo"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void findAllAsUser() throws Exception {
         mockMvc.perform(get("/api/todo")
                 .with(userDetailsService("user"))
         )
@@ -150,7 +204,14 @@ public class ITAnnotationTodoControllerTest {
 
     @Test
     @ExpectedDatabase("toDoData.xml")
-    public void findById() throws Exception {
+    public void findByIdAsAnonymous() throws Exception {
+        mockMvc.perform(get("/api/todo/{id}", 1L))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void findByIdAsUser() throws Exception {
         mockMvc.perform(get("/api/todo/{id}", 1L)
                 .with(userDetailsService("user"))
         )
@@ -160,9 +221,15 @@ public class ITAnnotationTodoControllerTest {
     }
 
     @Test
-    @SecurityRole("ROLE_USER")
     @ExpectedDatabase("toDoData.xml")
-    public void findByIdWhenTodoIsNotFound() throws Exception {
+    public void findByIdWhenTodoIsNotFoundAsAnonymous() throws Exception {
+        mockMvc.perform(get("/api/todo/{id}", 3L))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void findByIdWhenTodoIsNotFoundAsUser() throws Exception {
         mockMvc.perform(get("/api/todo/{id}", 3L)
                 .with(userDetailsService("user"))
         )
@@ -170,8 +237,20 @@ public class ITAnnotationTodoControllerTest {
     }
 
     @Test
+    @ExpectedDatabase(value="toDoData.xml")
+    public void updateAsAnonymous() throws Exception {
+        TodoDTO updated = TodoTestUtil.createDTO(1L, "description", "title");
+
+        mockMvc.perform(put("/api/todo/{id}", 1L)
+                .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
+                .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
+        )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     @ExpectedDatabase(value="toDoData-update-expected.xml", assertionMode = DatabaseAssertionMode.NON_STRICT)
-    public void update() throws Exception {
+    public void updateAsUser() throws Exception {
         TodoDTO updated = TodoTestUtil.createDTO(1L, "description", "title");
 
         mockMvc.perform(put("/api/todo/{id}", 1L)
@@ -186,7 +265,19 @@ public class ITAnnotationTodoControllerTest {
 
     @Test
     @ExpectedDatabase("toDoData.xml")
-    public void updateEmptyTodo() throws Exception {
+    public void updateEmptyTodoAsAnonymous() throws Exception {
+        TodoDTO updated = TodoTestUtil.createDTO(1L, "", "");
+
+        mockMvc.perform(put("/api/todo/{id}", 1L)
+                .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
+                .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
+        )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void updateEmptyTodoAsUser() throws Exception {
         TodoDTO updated = TodoTestUtil.createDTO(1L, "", "");
 
         mockMvc.perform(put("/api/todo/{id}", 1L)
@@ -201,7 +292,22 @@ public class ITAnnotationTodoControllerTest {
 
     @Test
     @ExpectedDatabase("toDoData.xml")
-    public void updateTodoWhenTitleAndDescriptionAreTooLong() throws Exception {
+    public void updateTodoWhenTitleAndDescriptionAreTooLongAsAnonymous() throws Exception {
+        String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
+        String description = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
+
+        TodoDTO updated = TodoTestUtil.createDTO(1L, description, title);
+
+        mockMvc.perform(put("/api/todo/{id}", 1L)
+                .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
+                .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
+        )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void updateTodoWhenTitleAndDescriptionAreTooLongAsUser() throws Exception {
         String title = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
         String description = TodoTestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
 
@@ -224,7 +330,19 @@ public class ITAnnotationTodoControllerTest {
 
     @Test
     @ExpectedDatabase("toDoData.xml")
-    public void updateTodoWhenTodoIsNotFound() throws Exception {
+    public void updateTodoWhenTodoIsNotFoundAsAnonymous() throws Exception {
+        TodoDTO updated = TodoTestUtil.createDTO(3L, "description", "title");
+
+        mockMvc.perform(put("/api/todo/{id}", 3L)
+                .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
+                .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
+        )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @ExpectedDatabase("toDoData.xml")
+    public void updateTodoWhenTodoIsNotFoundAsUser() throws Exception {
         TodoDTO updated = TodoTestUtil.createDTO(3L, "description", "title");
 
         mockMvc.perform(put("/api/todo/{id}", 3L)
