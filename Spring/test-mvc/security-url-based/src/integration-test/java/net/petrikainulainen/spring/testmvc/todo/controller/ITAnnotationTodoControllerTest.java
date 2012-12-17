@@ -58,9 +58,6 @@ public class ITAnnotationTodoControllerTest {
     @Resource
     private DataSource datasource;
 
-    @Rule
-    public SpringSecurityRoleRule roleRule = new SpringSecurityRoleRule(this);
-
     private MockMvc mockMvc;
 
     @Before
