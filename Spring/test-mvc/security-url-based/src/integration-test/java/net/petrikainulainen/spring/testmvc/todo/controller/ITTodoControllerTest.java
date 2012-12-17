@@ -5,6 +5,7 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
 import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import net.petrikainulainen.spring.testmvc.*;
+import net.petrikainulainen.spring.testmvc.config.ExampleApplicationContext;
 import net.petrikainulainen.spring.testmvc.todo.TodoTestUtil;
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
 import net.petrikainulainen.spring.testmvc.todo.model.Todo;
@@ -27,26 +28,24 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.endsWith;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.server.samples.context.SecurityRequestPostProcessors.userDetailsService;
 
 /**
- * This test uses the xml based application context configuration.
+ * This test uses the annotation based application context configuration.
  * @author Petri Kainulainen
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader = WebContextLoader.class, locations = {"classpath:exampleApplicationContext.xml"})
+@ContextConfiguration(loader = WebContextLoader.class, classes = {ExampleApplicationContext.class})
+//@ContextConfiguration(loader = WebContextLoader.class, locations = {"classpath:exampleApplicationContext.xml"})
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
         DbUnitTestExecutionListener.class })
 @DatabaseSetup("toDoData.xml")
-public class ITXmlTodoControllerTest {
+public class ITTodoControllerTest {
 
     @Resource
     private FilterChainProxy springSecurityFilterChain;
@@ -355,3 +354,4 @@ public class ITXmlTodoControllerTest {
                 .andExpect(status().isNotFound());
     }
 }
+

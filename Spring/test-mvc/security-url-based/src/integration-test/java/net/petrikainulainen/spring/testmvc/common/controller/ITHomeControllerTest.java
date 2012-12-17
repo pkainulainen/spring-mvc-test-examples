@@ -23,8 +23,9 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.v
  * @author Petri Kainulainen
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader = WebContextLoader.class, locations = {"classpath:exampleApplicationContext.xml"})
-public class ITXmlHomeControllerTest {
+@ContextConfiguration(loader = WebContextLoader.class, classes = {ExampleApplicationContext.class})
+//@ContextConfiguration(loader = WebContextLoader.class, locations = {"classpath:exampleApplicationContext.xml"})
+public class ITHomeControllerTest {
 
     @Resource
     private FilterChainProxy springSecurityFilterChain;
