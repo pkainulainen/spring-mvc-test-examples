@@ -30,6 +30,7 @@
         <property name="filterProcessesUrl" value="/api/login"/>
         <property name="usernameParameter" value="username"/>
         <property name="passwordParameter" value="password"/>
+        <property name="postOnly" value="true"/>
     </bean>
 
     <!-- Configures a custom authentication success handler that returns the HTTP status code 200 instead of the 301 HTTP status code -->
