@@ -83,7 +83,7 @@ public class ITTodoControllerTest {
         mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -108,7 +108,7 @@ public class ITTodoControllerTest {
         mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isBadRequest())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -139,7 +139,7 @@ public class ITTodoControllerTest {
         mockMvc.perform(post("/api/todo")
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(added))
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isBadRequest())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -162,7 +162,7 @@ public class ITTodoControllerTest {
     @ExpectedDatabase("toDoData-delete-expected.xml")
     public void deleteByIdAsUser() throws Exception {
         mockMvc.perform(delete("/api/todo/{id}", 1L)
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -180,7 +180,7 @@ public class ITTodoControllerTest {
     @ExpectedDatabase("toDoData.xml")
     public void deleteByIdWhenTodoIsNotFoundAsUser() throws Exception {
         mockMvc.perform(delete("/api/todo/{id}", 3L)
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isNotFound());
     }
@@ -196,7 +196,7 @@ public class ITTodoControllerTest {
     @ExpectedDatabase("toDoData.xml")
     public void findAllAsUser() throws Exception {
         mockMvc.perform(get("/api/todo")
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -214,7 +214,7 @@ public class ITTodoControllerTest {
     @ExpectedDatabase("toDoData.xml")
     public void findByIdAsUser() throws Exception {
         mockMvc.perform(get("/api/todo/{id}", 1L)
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -232,7 +232,7 @@ public class ITTodoControllerTest {
     @ExpectedDatabase("toDoData.xml")
     public void findByIdWhenTodoIsNotFoundAsUser() throws Exception {
         mockMvc.perform(get("/api/todo/{id}", 3L)
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isNotFound());
     }
@@ -257,7 +257,7 @@ public class ITTodoControllerTest {
         mockMvc.perform(put("/api/todo/{id}", 1L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isOk())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -284,7 +284,7 @@ public class ITTodoControllerTest {
         mockMvc.perform(put("/api/todo/{id}", 1L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isBadRequest())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -317,7 +317,7 @@ public class ITTodoControllerTest {
         mockMvc.perform(put("/api/todo/{id}", 1L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isBadRequest())
                 .andExpect(content().mimeType(IntegrationTestUtil.APPLICATION_JSON_UTF8))
@@ -349,7 +349,7 @@ public class ITTodoControllerTest {
         mockMvc.perform(put("/api/todo/{id}", 3L)
                 .contentType(IntegrationTestUtil.APPLICATION_JSON_UTF8)
                 .body(IntegrationTestUtil.convertObjectToJsonBytes(updated))
-                .with(userDetailsService("user"))
+                .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isNotFound());
     }
