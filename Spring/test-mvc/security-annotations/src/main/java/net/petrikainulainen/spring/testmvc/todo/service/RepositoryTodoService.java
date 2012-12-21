@@ -37,7 +37,7 @@ public class RepositoryTodoService implements TodoService {
         return repository.save(model);
     }
 
-    @PreAuthorize("hasPermission('Todo', 'add')")
+    @PreAuthorize("hasPermission('Todo', 'delete')")
     @Transactional(rollbackFor = {TodoNotFoundException.class})
     @Override
     public Todo deleteById(Long id) throws TodoNotFoundException {
@@ -50,7 +50,7 @@ public class RepositoryTodoService implements TodoService {
         return deleted;
     }
 
-    @PreAuthorize("hasPermission('Todo', 'add')")
+    @PreAuthorize("hasPermission('Todo', 'list')")
     @Transactional(readOnly = true)
     @Override
     public List<Todo> findAll() {
@@ -58,7 +58,7 @@ public class RepositoryTodoService implements TodoService {
         return repository.findAll();
     }
 
-    @PreAuthorize("hasPermission('Todo', 'add')")
+    @PreAuthorize("hasPermission('Todo', 'find')")
     @Transactional(readOnly = true, rollbackFor = {TodoNotFoundException.class})
     @Override
     public Todo findById(Long id) throws TodoNotFoundException {
@@ -74,7 +74,7 @@ public class RepositoryTodoService implements TodoService {
         return found;
     }
 
-    @PreAuthorize("hasPermission('Todo', 'add')")
+    @PreAuthorize("hasPermission('Todo', 'update')")
     @Transactional(rollbackFor = {TodoNotFoundException.class})
     @Override
     public Todo update(TodoDTO updated) throws TodoNotFoundException {
