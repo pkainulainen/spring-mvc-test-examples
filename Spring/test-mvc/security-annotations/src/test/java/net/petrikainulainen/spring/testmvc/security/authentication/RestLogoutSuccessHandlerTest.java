@@ -5,10 +5,10 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.TestingAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static junit.framework.Assert.assertEquals;
@@ -16,23 +16,23 @@ import static junit.framework.Assert.assertEquals;
 /**
  * @author Petri Kainulainen
  */
-public class RestAuthenticationSuccessHandlerTest {
+public class RestLogoutSuccessHandlerTest {
 
-    private RestAuthenticationSuccessHandler successHandler;
+    private RestLogoutSuccessHandler logoutSuccessHandler;
 
     @Before
     public void setUp() {
-        successHandler = new RestAuthenticationSuccessHandler();
+        logoutSuccessHandler = new RestLogoutSuccessHandler();
     }
 
     @Test
-    public void onAuthenticationSuccess() throws ServletException, IOException {
+    public void onLogoutSuccess() throws IOException, ServletException {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
         Authentication authentication = new TestingAuthenticationToken(null, null);
 
-        successHandler.onAuthenticationSuccess(request, response, authentication);
+        logoutSuccessHandler.onLogoutSuccess(request, response, authentication);
 
-        assertEquals(MockHttpServletResponse.SC_OK, response.getStatus());
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
     }
 }
