@@ -60,22 +60,31 @@ TodoApp.spinner = new Spinner({
 TodoApp.user = 'anonymous';
 
 TodoApp.addInitializer(function(){
-    TodoApp.getLoggedInUser();
+    TodoApp.getLoggedInUser(TodoApp.showLogoutLink);
 });
 
 TodoApp.getLoggedInUser = function(callback) {
-    $.get("/api/user", function(data) {
-        if (data.username) {
-            window.log("Found logged in user: ", data);
-            TodoApp.user = new TodoApp.Models.User(data);
-            if (callback) {
-                callback();
+    $.ajax({
+        async: false,
+        type: "GET",
+        url: "/api/user",
+        success: function(data) {
+            if (data.username) {
+                window.log("Found logged in user: ", data);
+                TodoApp.user = new TodoApp.Models.User(data);
+                if (callback) {
+                    callback();
+                }
+            }
+            else {
+                window.log("Logged in user was not found.")
             }
         }
-        else {
-            window.log("Logged in user was not found.")
-        }
     });
+}
+
+TodoApp.showLogoutLink = function() {
+    $("#logout-link-holder").removeClass("hidden");
 };
 
 $(document).bind('ajaxStart', function() {
