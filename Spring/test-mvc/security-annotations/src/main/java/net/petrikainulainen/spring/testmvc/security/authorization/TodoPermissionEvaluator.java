@@ -27,7 +27,7 @@ public class TodoPermissionEvaluator implements PermissionEvaluator {
 
         boolean hasPermission = false;
 
-        if (targetDomainObject instanceof Todo || targetDomainObject.equals("Todo")) {
+        if (targetDomainObject.equals("Todo")) {
             Object principal = authentication.getPrincipal();
             if (principal instanceof UserDetails) {
                 LOGGER.debug("User is not anonymous. Evaluation permission");
@@ -41,6 +41,9 @@ public class TodoPermissionEvaluator implements PermissionEvaluator {
             else {
                 LOGGER.debug("User is anonymous. Permission denied.");
             }
+        }
+        else {
+            LOGGER.debug("Unknown class: {} for target domain Object: {}", targetDomainObject.getClass(), targetDomainObject);
         }
 
         LOGGER.debug("Returning: {}", hasPermission);
@@ -58,6 +61,12 @@ public class TodoPermissionEvaluator implements PermissionEvaluator {
         return false;
     }
 
+    /**
+     * Returns the role of the logged in user. We assume that each user has only one
+     * role.
+     * @param authorities
+     * @return  The role of the logged in user.
+     */
     private String getRole(Collection<? extends GrantedAuthority> authorities) {
         return authorities.iterator().next().getAuthority();
     }
