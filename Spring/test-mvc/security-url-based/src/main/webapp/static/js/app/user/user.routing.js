@@ -3,7 +3,8 @@ TodoApp.UserRouting = function() {
 
     UserRouting.Router = Backbone.Marionette.AppRouter.extend({
         appRoutes: {
-            "user/login": "login"
+            "user/login": "login",
+            "user/logout": "logout"
         }
     });
 

@@ -12,7 +12,14 @@ TodoApp.vent.on("user:loginFailed", function() {
 TodoApp.vent.on("user:loginSuccess", function() {
     var showTodoList = function() {
         Backbone.history.navigate("#/");
+        TodoApp.showLogoutLink();
     }
 
     TodoApp.getLoggedInUser(showTodoList);
+});
+
+
+TodoApp.vent.on("user:logoutSuccess", function() {
+    TodoApp.setUserAsAnonymous();
+    Backbone.history.navigate("#/");
 });
