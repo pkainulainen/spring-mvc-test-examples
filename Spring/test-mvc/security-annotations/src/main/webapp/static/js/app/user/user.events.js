@@ -17,3 +17,8 @@ TodoApp.vent.on("user:loginSuccess", function() {
 
     TodoApp.getLoggedInUser(showTodoList);
 });
+
+TodoApp.vent.on("user:logoutSuccess", function() {
+   TodoApp.setUserAsAnonymous();
+    Backbone.history.navigate("#/");
+});

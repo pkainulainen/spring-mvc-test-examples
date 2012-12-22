@@ -83,6 +83,11 @@ TodoApp.getLoggedInUser = function(callback) {
     });
 }
 
+TodoApp.setUserAsAnonymous = function() {
+    $("#logout-link-holder").addClass("hidden");
+    TodoApp.user = 'anonymous';
+}
+
 TodoApp.showLogoutLink = function() {
     $("#logout-link-holder").removeClass("hidden");
 };

@@ -57,7 +57,7 @@
 
                 <div id="logout-link-holder" class="hidden nav-collapse pull-right">
                     <ul class="nav">
-                        <li><a href="/api/logout"><spring:message code="label.logout.link"/></a></li>
+                        <li><a href="#/user/logout"><spring:message code="label.logout.link"/></a></li>
                     </ul>
                 </div>
             </div>
