@@ -16,7 +16,7 @@
 
         <!-- Configures a reference to custom login filter -->
         <security:custom-filter ref="loginFilter" position="FORM_LOGIN_FILTER"/>
-        <security:logout logout-url="/api/logout" delete-cookies="true" invalidate-session="true"/>
+        <security:logout logout-url="/api/logout" delete-cookies="true" invalidate-session="true" success-handler-ref="restLogoutSuccessHandler"/>
     </security:http>
 
     <!-- Configures the authentication entry point -->
@@ -38,6 +38,9 @@
 
     <!-- Configures a custom authentication failure handler -->
     <bean id="restAuthenticationFailureHandler" class="net.petrikainulainen.spring.testmvc.security.authentication.RestAuthenticationFailureHandler"/>
+
+    <!-- Configures a custom logout success handler -->
+    <bean id="restLogoutSuccessHandler" class="net.petrikainulainen.spring.testmvc.security.authentication.RestLogoutSuccessHandler"/>
 
     <!-- Configures in-memory implementation of the UserDetailsService implementation -->
     <security:authentication-manager alias="authenticationManager">
