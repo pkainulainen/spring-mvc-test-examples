@@ -64,19 +64,24 @@ TodoApp.addInitializer(function(){
 });
 
 TodoApp.getLoggedInUser = function(callback) {
-    $.get("/api/user", function(data) {
-        if (data.username) {
-            window.log("Found logged in user: ", data);
-            TodoApp.user = new TodoApp.Models.User(data);
-            if (callback) {
-                callback();
+    $.ajax({
+        async: false,
+        type: "GET",
+        url: "/api/user",
+        success: function(data) {
+            if (data.username) {
+                window.log("Found logged in user: ", data);
+                TodoApp.user = new TodoApp.Models.User(data);
+                if (callback) {
+                    callback();
+                }
+            }
+            else {
+                window.log("Logged in user was not found.")
             }
         }
-        else {
-            window.log("Logged in user was not found.")
-        }
     });
-};
+}
 
 $(document).bind('ajaxStart', function() {
     window.log("ajaxStart");
