@@ -6,20 +6,21 @@
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
     <!-- Disable security on static resources -->
-    <security:http pattern="/static/**" security="none"/>
+    <security:http pattern="/static/**" security="none" use-expressions="true"/>
 
     <!-- Enable Spring Security -->
-    <security:http entry-point-ref="restAuthenticationEntryPoint" use-expressions="true">
+    <security:http entry-point-ref="restAuthenticationEntryPoint">
         <!-- Configures the security rules of our REST API -->
         <security:intercept-url pattern="/api/user" access="permitAll()"/>
         <security:intercept-url pattern="/api/**" access="hasRole('ROLE_USER')"/>
 
-        <!-- Configures a reference to custom login filter -->
+        <!-- Adds the custom login filter to Spring Security filter chain -->
         <security:custom-filter ref="loginFilter" position="FORM_LOGIN_FILTER"/>
+        <!-- Adds a logout filter to Spring Security filter chain -->
         <security:logout logout-url="/api/logout" delete-cookies="true" invalidate-session="true" success-handler-ref="restLogoutSuccessHandler"/>
     </security:http>
 
-    <!-- Configures the authentication entry point -->
+    <!-- Configures the authentication entry point that returns HTTP status code 401 -->
     <bean id="restAuthenticationEntryPoint" class="net.petrikainulainen.spring.testmvc.security.authentication.RestAuthenticationEntryPoint"/>
 
     <!-- Configures a custom login filter bean -->
@@ -33,13 +34,13 @@
         <property name="postOnly" value="true"/>
     </bean>
 
-    <!-- Configures a custom authentication success handler that returns the HTTP status code 200 instead of the 301 HTTP status code -->
+    <!-- Configures a custom authentication success handler that returns HTTP status code 200 -->
     <bean id="restAuthenticationSuccessHandler" class="net.petrikainulainen.spring.testmvc.security.authentication.RestAuthenticationSuccessHandler"/>
 
-    <!-- Configures a custom authentication failure handler -->
+    <!-- Configures a custom authentication failure handler that returns HTTP status code 401 -->
     <bean id="restAuthenticationFailureHandler" class="net.petrikainulainen.spring.testmvc.security.authentication.RestAuthenticationFailureHandler"/>
 
-    <!-- Configures a custom logout success handler -->
+    <!-- Configures a custom logout success handler that returns HTTP status code 200 -->
     <bean id="restLogoutSuccessHandler" class="net.petrikainulainen.spring.testmvc.security.authentication.RestLogoutSuccessHandler"/>
 
     <!-- Configures in-memory implementation of the UserDetailsService implementation -->

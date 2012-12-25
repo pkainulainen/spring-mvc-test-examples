@@ -2,14 +2,10 @@ package net.petrikainulainen.spring.testmvc.user;
 
 import net.petrikainulainen.spring.testmvc.IntegrationTestUtil;
 import net.petrikainulainen.spring.testmvc.config.ExampleApplicationContext;
-import net.petrikainulainen.spring.testmvc.user.dto.SecurityRole;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -20,9 +16,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.annotation.Resource;
 
-import java.util.Collection;
-
-import static junit.framework.Assert.assertEquals;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
@@ -74,7 +67,6 @@ public class ITAuthenticationTest {
     @Test
     public void loginByUsingIncorrectRequestMethod() throws Exception {
         mockMvc.perform(get("/api/login")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param(IntegrationTestUtil.REQUEST_PARAMETER_USERNAME, IntegrationTestUtil.CORRECT_USERNAME)
                 .param(IntegrationTestUtil.REQUEST_PARAMETER_PASSWORD, IntegrationTestUtil.CORRECT_PASSWORD)
         )
@@ -87,6 +79,5 @@ public class ITAuthenticationTest {
                 .with(userDetailsService(IntegrationTestUtil.CORRECT_USERNAME))
         )
                 .andExpect(status().isOk());
-
     }
 }

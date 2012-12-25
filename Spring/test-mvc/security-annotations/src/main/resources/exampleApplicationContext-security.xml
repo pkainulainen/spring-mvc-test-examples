@@ -10,13 +10,15 @@
 
     <!-- Enable Spring Security -->
     <security:http entry-point-ref="restAuthenticationEntryPoint" use-expressions="true">
-        <!-- Configures a reference to custom login filter -->
+        <!-- Adds the custom login filter to the Spring Security filter chain -->
         <security:custom-filter ref="loginFilter" position="FORM_LOGIN_FILTER"/>
+        <!-- Add the logout filter to the Spring Security filter chain -->
         <security:logout logout-url="/api/logout" delete-cookies="true" invalidate-session="true" success-handler-ref="restLogoutSuccessHandler"/>
     </security:http>
 
     <!-- Enable @PreAuthorize and @PostAuthorize annotations -->
     <security:global-method-security pre-post-annotations="enabled">
+        <!-- Adds a reference to the used expression handler bean -->
         <security:expression-handler ref="expressionHandler"/>
     </security:global-method-security>
 
