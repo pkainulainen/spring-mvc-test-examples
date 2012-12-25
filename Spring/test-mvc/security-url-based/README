@@ -1,5 +1,8 @@
 This is an example application of my blog entry that describe the integration testing of Spring MVC application that
-uses url based security.
+uses url based security:
+
+Integration Testing of Spring MVC Applications: Security:
+http://www.petrikainulainen.net/programming/spring-framework/integration-testing-of-spring-mvc-applications-security/
 
 RUNNING THE APPLICATION:
 
@@ -7,6 +10,7 @@ RUNNING THE APPLICATION:
 - Go the root directory of project (The one which contains the pom.xml file)
 - Run command mvn clean jetty:run
 - Start your browser and go to the location: http://localhost:8080
+- Use credentials (user/password) to log in.
 
 RUNNING TESTS:
 

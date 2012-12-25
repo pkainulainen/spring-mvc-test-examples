@@ -6,10 +6,10 @@
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
     <!-- Disable security on static resources -->
-    <security:http pattern="/static/**" security="none" use-expressions="true"/>
+    <security:http pattern="/static/**" security="none"/>
 
     <!-- Enable Spring Security -->
-    <security:http entry-point-ref="restAuthenticationEntryPoint">
+    <security:http entry-point-ref="restAuthenticationEntryPoint" use-expressions="true">
         <!-- Configures the security rules of our REST API -->
         <security:intercept-url pattern="/api/user" access="permitAll()"/>
         <security:intercept-url pattern="/api/**" access="hasRole('ROLE_USER')"/>
