@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!-- Disable security on static resources -->
+    <security:http pattern="/static/**" security="none"/>
+
+    <!-- Enable Spring Security -->
+    <security:http entry-point-ref="restAuthenticationEntryPoint" use-expressions="true">
+        <!-- Adds the custom login filter to the Spring Security filter chain -->
+        <security:custom-filter ref="loginFilter" position="FORM_LOGIN_FILTER"/>
+        <!-- Add the logout filter to the Spring Security filter chain -->
+        <security:logout logout-url="/api/logout" delete-cookies="true" invalidate-session="true" success-handler-ref="restLogoutSuccessHandler"/>
+    </security:http>
+
+    <!-- Enable @PreAuthorize and @PostAuthorize annotations -->
+    <security:global-method-security pre-post-annotations="enabled">
+        <!-- Adds a reference to the used expression handler bean -->
+        <security:expression-handler ref="expressionHandler"/>
+    </security:global-method-security>
+
+    <bean id="expressionHandler" class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
+        <property name="permissionEvaluator" ref="todoPermissionEvaluator" />
+    </bean>
+
+    <bean id="todoPermissionEvaluator" class="net.petrikainulainen.spring.testmvc.security.authorization.TodoPermissionEvaluator"/>
+
+    <!-- Configures the authentication entry point -->
+    <bean id="restAuthenticationEntryPoint" class="net.petrikainulainen.spring.testmvc.security.authentication.RestAuthenticationEntryPoint"/>
+
+    <!-- Configures a custom login filter bean -->
+    <bean id="loginFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationFailureHandler" ref="restAuthenticationFailureHandler"/>
+        <property name="authenticationSuccessHandler" ref="restAuthenticationSuccessHandler"/>
+        <property name="filterProcessesUrl" value="/api/login"/>
+        <property name="usernameParameter" value="username"/>
+        <property name="passwordParameter" value="password"/>
+        <property name="postOnly" value="true"/>
+    </bean>
+
+    <!-- Configures a custom authentication success handler that returns the HTTP status code 200 instead of the 301 HTTP status code -->
+    <bean id="restAuthenticationSuccessHandler" class="net.petrikainulainen.spring.testmvc.security.authentication.RestAuthenticationSuccessHandler"/>
+
+    <!-- Configures a custom authentication failure handler -->
+    <bean id="restAuthenticationFailureHandler" class="net.petrikainulainen.spring.testmvc.security.authentication.RestAuthenticationFailureHandler"/>
+
+    <!-- Configures a custom logout success handler -->
+    <bean id="restLogoutSuccessHandler" class="net.petrikainulainen.spring.testmvc.security.authentication.RestLogoutSuccessHandler"/>
+
+    <!-- Configures in-memory implementation of the UserDetailsService implementation -->
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider>
+            <security:user-service>
+                <security:user name="user" password="password" authorities="ROLE_USER"/>
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
+</beans>
