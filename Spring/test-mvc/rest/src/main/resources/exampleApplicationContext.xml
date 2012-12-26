@@ -18,23 +18,6 @@
     <context:component-scan base-package="net.petrikainulainen.spring.testmvc.todo.controller"/>
     <context:component-scan base-package="net.petrikainulainen.spring.testmvc.todo.service"/>
 
-    <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
-        <property name="exceptionMappings">
-            <props>
-                <prop key="net.petrikainulainen.spring.testmvc.todo.exception.TodoNotFoundException">error/404</prop>
-                <prop key="java.lang.Exception">error/error</prop>
-                <prop key="java.lang.RuntimeException">error/error</prop>
-            </props>
-        </property>
-        <property name="statusCodes">
-            <props>
-                <prop key="error/404">404</prop>
-                <prop key="error/error">500</prop>
-            </props>
-        </property>
-    </bean>
-
-
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="basename" value="i18n/messages"/>
         <property name="useCodeAsDefaultMessage" value="true"/>
