@@ -1,5 +1,8 @@
-This is an example application of my blog entry that describe how we can migrate our integration tests from Spring 3.1
-to Spring 3.2.
+This is an example application of my blog entry that describe how we can migrate our integration tests
+from Spring 3.1 to Spring 3.2.
+
+Integration Testing of Spring MVC Applications: Migrating to Spring 3.2:
+http://www.petrikainulainen.net/programming/spring-framework/integration-testing-of-spring-mvc-applications-migrating-to-spring-3-2/
 
 RUNNING THE APPLICATION:
 
