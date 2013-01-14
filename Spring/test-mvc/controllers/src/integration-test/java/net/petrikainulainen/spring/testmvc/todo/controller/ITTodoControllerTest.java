@@ -5,18 +5,12 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
 import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import net.petrikainulainen.spring.testmvc.IntegrationTestUtil;
-import net.petrikainulainen.spring.testmvc.SpringTestMvcRule;
-import net.petrikainulainen.spring.testmvc.ApplicationContextSetup;
 import net.petrikainulainen.spring.testmvc.common.controller.ErrorController;
 import net.petrikainulainen.spring.testmvc.config.ExampleApplicationContext;
-import net.petrikainulainen.spring.testmvc.config.IntegrationTestApplicationContext;
 import net.petrikainulainen.spring.testmvc.todo.TodoTestUtil;
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
 import net.petrikainulainen.spring.testmvc.todo.model.Todo;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.hamcrest.core.IsNull;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.MediaType;
@@ -27,28 +21,25 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.web.server.MockMvc;
+import org.springframework.test.web.server.samples.context.WebContextLoader;
+import org.springframework.test.web.server.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.server.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.*;
 
 /**
  * This test uses the annotation based application context configuration.
  * @author Petri Kainulainen
  */
-@ApplicationContextSetup(configurationClass = ExampleApplicationContext.class)
-//@ApplicationContextSetup(configurationFile = "classpath:exampleApplicationContext.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {IntegrationTestApplicationContext.class})
+@ContextConfiguration(loader = WebContextLoader.class, classes = {ExampleApplicationContext.class})
+//@ContextConfiguration(loader = WebContextLoader.class, locations = {"classpath:exampleApplicationContext.xml"})
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
@@ -59,10 +50,16 @@ public class ITTodoControllerTest {
     @Resource
     private DataSource datasource;
 
-    @Rule
-    public SpringTestMvcRule rule = new SpringTestMvcRule(this);
+    @Resource
+    private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
+
+    @Before
+    public void setUp() {
+        mockMvc = MockMvcBuilders.webApplicationContextSetup(webApplicationContext)
+                .build();
+    }
 
     @Test
     @ExpectedDatabase("toDoData.xml")
