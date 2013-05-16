@@ -1,0 +1,18 @@
+This is an example application of my blog entry that describes how we can create assertions
+by using the JsonPath library.
+
+Integration Testing of Spring MVC Applications: Creating assertion with JsonPath (Not published yet)
+
+RUNNING THE APPLICATION:
+
+- Download and install Maven 3 (http://maven.apache.org/download.html#Installation). If you have already installed Maven 3, you can skip this step.
+- Go the root directory of project (The one which contains the pom.xml file)
+- Run command mvn clean jetty:run
+- Start your browser and go to the location: http://localhost:8080
+- Use credentials (user/password) to log in.
+
+RUNNING TESTS:
+
+- You can run unit tests by using this command: mvn test -P dev
+- You can run integration tests by using this command: mvn verify -P integration-test
+
