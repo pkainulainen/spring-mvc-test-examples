@@ -1,11 +1,9 @@
 package net.petrikainulainen.spring.testmvc.todo.controller;
 
 import net.petrikainulainen.spring.testmvc.common.controller.ErrorController;
-import net.petrikainulainen.spring.testmvc.config.TestContext;
-import net.petrikainulainen.spring.testmvc.config.WebAppContext;
 import net.petrikainulainen.spring.testmvc.todo.TestUtil;
-import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTOBuilder;
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
+import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTOBuilder;
 import net.petrikainulainen.spring.testmvc.todo.exception.TodoNotFoundException;
 import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 import net.petrikainulainen.spring.testmvc.todo.model.TodoBuilder;
@@ -13,51 +11,99 @@ import net.petrikainulainen.spring.testmvc.todo.service.TodoService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
 
 import java.util.Arrays;
+import java.util.Properties;
 
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 /**
  * @author Petri Kainulainen
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestContext.class, WebAppContext.class})
-//@ContextConfiguration(locations = {"classpath:testContext.xml", "classpath:exampleApplicationContext-web.xml"})
-@WebAppConfiguration
-public class TodoControllerTest {
+@RunWith(MockitoJUnitRunner.class)
+public class StandaloneTodoControllerTest {
+
+    private static final String MESSAGE_SOURCE_BASE_NAME = "i18n/messages";
+    private static final String VIEW_RESOLVER_PREFIX = "/WEB-INF/jsp/";
+    private static final String VIEW_RESOLVER_SUFFIX = ".jsp";
 
     private MockMvc mockMvc;
 
-    @Autowired
+    @Mock
     private TodoService todoServiceMock;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @Before
     public void setUp() {
-        //We have to reset our mock between tests because the mock objects
-        //are managed by the Spring container. If we would not reset them,
-        //stubbing and verified behavior would "leak" from one test to another.
-        Mockito.reset(todoServiceMock);
+        mockMvc = MockMvcBuilders.standaloneSetup(new TodoController(messageSource(), todoServiceMock))
+                .setHandlerExceptionResolvers(exceptionResolver())
+                .setValidator(validator())
+                .setViewResolvers(viewResolver())
+                .build();
+    }
 
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    private HandlerExceptionResolver exceptionResolver() {
+        SimpleMappingExceptionResolver exceptionResolver = new SimpleMappingExceptionResolver();
+
+        Properties exceptionMappings = new Properties();
+
+        exceptionMappings.put("net.petrikainulainen.spring.testmvc.todo.exception.TodoNotFoundException", "error/404");
+        exceptionMappings.put("java.lang.Exception", "error/error");
+        exceptionMappings.put("java.lang.RuntimeException", "error/error");
+
+        exceptionResolver.setExceptionMappings(exceptionMappings);
+
+        Properties statusCodes = new Properties();
+
+        statusCodes.put("error/404", "404");
+        statusCodes.put("error/error", "500");
+
+        exceptionResolver.setStatusCodes(statusCodes);
+
+        return exceptionResolver;
+    }
+
+    private MessageSource messageSource() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+
+        messageSource.setBasename(MESSAGE_SOURCE_BASE_NAME);
+        messageSource.setUseCodeAsDefaultMessage(true);
+
+        return messageSource;
+    }
+
+    private LocalValidatorFactoryBean validator() {
+        return new LocalValidatorFactoryBean();
+    }
+
+    private ViewResolver viewResolver() {
+        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+
+        viewResolver.setViewClass(JstlView.class);
+        viewResolver.setPrefix(VIEW_RESOLVER_PREFIX);
+        viewResolver.setSuffix(VIEW_RESOLVER_SUFFIX);
+
+        return viewResolver;
     }
 
     @Test
