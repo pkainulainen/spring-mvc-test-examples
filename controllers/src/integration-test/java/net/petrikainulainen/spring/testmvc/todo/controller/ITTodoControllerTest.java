@@ -48,9 +48,6 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.*
 public class ITTodoControllerTest {
 
     @Resource
-    private DataSource datasource;
-
-    @Resource
     private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;

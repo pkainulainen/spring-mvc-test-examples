@@ -58,9 +58,6 @@ public class ITTodoControllerTest {
     @Resource
     private WebApplicationContext webApplicationContext;
 
-    @Resource
-    private DataSource datasource;
-
     private MockMvc mockMvc;
 
     @Before
