@@ -143,6 +143,7 @@ public class WebApplicationContextTodoControllerTest {
         )
                 .andExpect(status().isMovedTemporarily())
                 .andExpect(view().name(expectedRedirectViewPath))
+                .andExpect(redirectedUrl("/todo/1"))
                 .andExpect(model().attribute(TodoController.PARAMETER_TODO_ID, is("1")))
                 .andExpect(flash().attribute(TodoController.FLASH_MESSAGE_KEY_FEEDBACK, is("Todo entry: title was added.")));
 
