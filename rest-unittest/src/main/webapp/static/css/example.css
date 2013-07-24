@@ -1,0 +1,20 @@
+.page {
+    margin-left: 5%;
+    margin-right: 5%
+}
+
+.content {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.page-content {
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.action-buttons {
+    bottom: 20px;
+    float: right;
+    position: relative;
+}
