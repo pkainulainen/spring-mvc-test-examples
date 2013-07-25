@@ -226,12 +226,12 @@ public class TodoControllerTest {
 
     @Test
     public void findById_TodoEntryNotFound_ShouldReturnHttpStatusCode404() throws Exception {
-        when(todoServiceMock.findById(3L)).thenThrow(new TodoNotFoundException(""));
+        when(todoServiceMock.findById(1L)).thenThrow(new TodoNotFoundException(""));
 
-        mockMvc.perform(get("/api/todo/{id}", 3L))
+        mockMvc.perform(get("/api/todo/{id}", 1L))
                 .andExpect(status().isNotFound());
 
-        verify(todoServiceMock, times(1)).findById(3L);
+        verify(todoServiceMock, times(1)).findById(1L);
         verifyNoMoreInteractions(todoServiceMock);
     }
 
