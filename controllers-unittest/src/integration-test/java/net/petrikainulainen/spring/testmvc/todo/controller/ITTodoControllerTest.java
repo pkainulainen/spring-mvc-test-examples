@@ -7,7 +7,7 @@ import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import net.petrikainulainen.spring.testmvc.common.controller.ErrorController;
 import net.petrikainulainen.spring.testmvc.config.ExampleApplicationContext;
 import net.petrikainulainen.spring.testmvc.todo.TestUtil;
-import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTOBuilder;
+import net.petrikainulainen.spring.testmvc.todo.WebTestConstants;
 import net.petrikainulainen.spring.testmvc.todo.dto.TodoDTO;
 import net.petrikainulainen.spring.testmvc.todo.model.Todo;
 import org.junit.Before;
@@ -27,10 +27,20 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.annotation.Resource;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 /**
  * This test uses the annotation based application context configuration.
@@ -73,11 +83,9 @@ public class ITTodoControllerTest {
     @Test
     @ExpectedDatabase("toDoData.xml")
     public void add_EmptyTodoEntry_ShouldRenderFormViewAndReturnValidationErrorForTitle() throws Exception {
-        TodoDTO formObject = new TodoDTO();
         mockMvc.perform(post("/todo/add")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(TestUtil.convertObjectToFormUrlEncodedBytes(formObject))
-                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, formObject)
+                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, new TodoDTO())
         )
                 .andExpect(status().isOk())
                 .andExpect(view().name(TodoController.VIEW_TODO_ADD))
@@ -94,15 +102,11 @@ public class ITTodoControllerTest {
         String title = TestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
         String description = TestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
 
-        TodoDTO formObject =  new TodoDTOBuilder()
-                .description(description)
-                .title(title)
-                .build();
-
         mockMvc.perform(post("/todo/add")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(TestUtil.convertObjectToFormUrlEncodedBytes(formObject))
-                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, formObject)
+                .param(WebTestConstants.FORM_FIELD_DESCRIPTION, description)
+                .param(WebTestConstants.FORM_FIELD_TITLE, title)
+                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, new TodoDTO())
         )
                 .andExpect(status().isOk())
                 .andExpect(view().name(TodoController.VIEW_TODO_ADD))
@@ -117,17 +121,13 @@ public class ITTodoControllerTest {
     @Test
     @ExpectedDatabase(value="toDoData-add-expected.xml", assertionMode = DatabaseAssertionMode.NON_STRICT)
     public void add_NewTodoEntry_ShouldAddTodoEntryAndRenderViewTodoEntryView() throws Exception {
-        TodoDTO formObject = new TodoDTOBuilder()
-                .description("description")
-                .title("title")
-                .build();
-
         String expectedRedirectViewPath = TestUtil.createRedirectViewPath(TodoController.REQUEST_MAPPING_TODO_VIEW);
 
         mockMvc.perform(post("/todo/add")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(TestUtil.convertObjectToFormUrlEncodedBytes(formObject))
-                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, formObject)
+                .param(WebTestConstants.FORM_FIELD_DESCRIPTION, "description")
+                .param(WebTestConstants.FORM_FIELD_TITLE, "title")
+                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, new TodoDTO())
         )
                 .andExpect(status().isMovedTemporarily())
                 .andExpect(view().name(expectedRedirectViewPath))
@@ -223,14 +223,10 @@ public class ITTodoControllerTest {
     @Test
     @ExpectedDatabase("toDoData.xml")
     public void update_EmptyTodoEntry_ShouldRenderFormViewAndReturnValidationErrorForTitle() throws Exception {
-        TodoDTO formObject = new TodoDTOBuilder()
-                .id(1L)
-                .build();
-
         mockMvc.perform(post("/todo/update")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(TestUtil.convertObjectToFormUrlEncodedBytes(formObject))
-                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, formObject)
+                .param(WebTestConstants.FORM_FIELD_ID, "1")
+                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, new TodoDTO())
         )
                 .andExpect(status().isOk())
                 .andExpect(view().name(TodoController.VIEW_TODO_UPDATE))
@@ -247,16 +243,12 @@ public class ITTodoControllerTest {
         String title = TestUtil.createStringWithLength(Todo.MAX_LENGTH_TITLE + 1);
         String description = TestUtil.createStringWithLength(Todo.MAX_LENGTH_DESCRIPTION + 1);
 
-        TodoDTO formObject = new TodoDTOBuilder()
-                .id(1L)
-                .description(description)
-                .title(title)
-                .build();
-
         mockMvc.perform(post("/todo/update")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(TestUtil.convertObjectToFormUrlEncodedBytes(formObject))
-                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, formObject)
+                .param(WebTestConstants.FORM_FIELD_DESCRIPTION, description)
+                .param(WebTestConstants.FORM_FIELD_ID, "1")
+                .param(WebTestConstants.FORM_FIELD_TITLE, title)
+                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, new TodoDTO())
         )
                 .andExpect(status().isOk())
                 .andExpect(view().name(TodoController.VIEW_TODO_UPDATE))
@@ -271,18 +263,14 @@ public class ITTodoControllerTest {
     @Test
     @ExpectedDatabase(value="toDoData-update-expected.xml", assertionMode = DatabaseAssertionMode.NON_STRICT)
     public void update_TodoEntryFound_ShouldUpdateTodoEntryAndRenderViewTodoEntryView() throws Exception {
-        TodoDTO formObject = new TodoDTOBuilder()
-                .id(1L)
-                .description("description")
-                .title("title")
-                .build();
-
         String expectedRedirectViewPath = TestUtil.createRedirectViewPath(TodoController.REQUEST_MAPPING_TODO_VIEW);
 
         mockMvc.perform(post("/todo/update")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(TestUtil.convertObjectToFormUrlEncodedBytes(formObject))
-                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, formObject)
+                .param(WebTestConstants.FORM_FIELD_DESCRIPTION, "description")
+                .param(WebTestConstants.FORM_FIELD_ID, "1")
+                .param(WebTestConstants.FORM_FIELD_TITLE, "title")
+                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, new TodoDTO())
         )
                 .andExpect(status().isMovedTemporarily())
                 .andExpect(view().name(expectedRedirectViewPath))
@@ -293,16 +281,12 @@ public class ITTodoControllerTest {
     @Test
     @ExpectedDatabase("toDoData.xml")
     public void update_TodoEntryNotFound_ShouldRender404View() throws Exception {
-        TodoDTO formObject = new TodoDTOBuilder()
-                .id(3L)
-                .description("description")
-                .title("title")
-                .build();
-
         mockMvc.perform(post("/todo/update")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(TestUtil.convertObjectToFormUrlEncodedBytes(formObject))
-                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, formObject)
+                .param(WebTestConstants.FORM_FIELD_DESCRIPTION, "description")
+                .param(WebTestConstants.FORM_FIELD_ID, "3")
+                .param(WebTestConstants.FORM_FIELD_TITLE, "title")
+                .sessionAttr(TodoController.MODEL_ATTRIBUTE_TODO, new TodoDTO())
         )
                 .andExpect(status().isNotFound())
                 .andExpect(view().name(ErrorController.VIEW_NOT_FOUND))
