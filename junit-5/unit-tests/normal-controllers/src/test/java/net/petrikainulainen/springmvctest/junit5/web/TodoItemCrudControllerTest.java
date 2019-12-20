@@ -12,18 +12,19 @@ import static org.mockito.Mockito.mock;
 
 class TodoItemCrudControllerTest {
 
-    private MockMvc mockMvc;
+    private TodoItemRequestBuilder requestBuilder;
     private TodoItemCrudService service;
 
     @BeforeEach
     void configureSystemUnderTest() {
         service = mock(TodoItemCrudService.class);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(new TodoItemCrudController(service))
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new TodoItemCrudController(service))
                 .setHandlerExceptionResolvers(exceptionResolver())
                 .setLocaleResolver(fixedLocaleResolver())
                 .setViewResolvers(jspViewResolver())
                 .build();
+        requestBuilder = new TodoItemRequestBuilder(mockMvc);
     }
 
     @Test
