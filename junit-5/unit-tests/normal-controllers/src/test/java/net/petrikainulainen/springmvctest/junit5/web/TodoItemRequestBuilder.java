@@ -1,6 +1,9 @@
 package net.petrikainulainen.springmvctest.junit5.web;
 
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 /**
  * Creates and sends the HTTP requests which are used
@@ -13,5 +16,17 @@ class TodoItemRequestBuilder {
 
     TodoItemRequestBuilder(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
+    }
+
+    /**
+     * Creates and sends the HTTP request which gets the
+     * HTML document that displays the information of the
+     * requested task.
+     * @param id    The id of the requested task.
+     * @return
+     * @throws Exception
+     */
+    ResultActions findById(Long id) throws Exception {
+        return mockMvc.perform(get("/todo-item/{id}", id));
     }
 }
