@@ -31,8 +31,8 @@ class TodoItemRequestBuilder {
     /**
      * Creates and sends the HTTP request which gets the
      * HTML document that displays the information of the
-     * requested task.
-     * @param id    The id of the requested task.
+     * requested todo item.
+     * @param id    The id of the requested todo item.
      * @return
      * @throws Exception
      */
