@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static net.petrikainulainen.springmvctest.junit5.web.WebTestConfig.*;
@@ -31,6 +33,130 @@ class TodoItemCrudControllerTest {
                 .setViewResolvers(jspViewResolver())
                 .build();
         requestBuilder = new TodoItemRequestBuilder(mockMvc);
+    }
+
+    @Nested
+    @DisplayName("Render the HTML view that displays the information of all todo items")
+    class FindAll {
+
+        @Test
+        @DisplayName("Should return the HTTP status code 200")
+        void shouldReturnHttpStatusCodeOk() throws Exception {
+            requestBuilder.findAll().andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("Should render the todo item list view")
+        void shouldRenderTodoItemListView() throws Exception {
+            requestBuilder.findAll().andExpect(view().name("todo-item/list"));
+        }
+
+        @Nested
+        @DisplayName("When no todo items is found from the database")
+        class WhenNoTodoItemsIsFoundFromDatabase {
+
+            @BeforeEach
+            void serviceReturnsEmptyList() {
+                given(service.findAll()).willReturn(new ArrayList<>());
+            }
+
+            @Test
+            @DisplayName("Should display zero todo items")
+            void shouldDisplayZeroTodoItems() throws Exception {
+                requestBuilder.findAll().andExpect(model().attribute("todoItems", hasSize(0)));
+            }
+        }
+
+        @Nested
+        @DisplayName("When two todo items are found from the database")
+        class WhenTwoTodoItemsAreFoundFromDatabase {
+
+            private final Long TODO_ITEM_ONE_ID = 1L;
+            private final String TODO_ITEM_ONE_TITLE = "first todo item";
+            private final Long TODO_ITEM_TWO_ID = 2L;
+            private final String TODO_ITEM_TWO_TITLE = "second todo item";
+
+            private final TodoItemStatus STATUS_OPEN = TodoItemStatus.OPEN;
+
+            @BeforeEach
+            void serviceReturnsTwoTodoItems() {
+                TodoListItemDTO first = new TodoListItemDTO();
+                first.setId(TODO_ITEM_ONE_ID);
+                first.setTitle(TODO_ITEM_ONE_TITLE);
+                first.setStatus(STATUS_OPEN);
+
+                TodoListItemDTO second = new TodoListItemDTO();
+                second.setId(TODO_ITEM_TWO_ID);
+                second.setTitle(TODO_ITEM_TWO_TITLE);
+                second.setStatus(STATUS_OPEN);
+
+                given(service.findAll()).willReturn(Arrays.asList(first, second));
+            }
+
+            @Test
+            @DisplayName("Should display two todo items")
+            void shouldDisplayTwoTodoItems() throws Exception {
+                requestBuilder.findAll().andExpect(model().attribute("todoItems", hasSize(2)));
+            }
+
+            /**
+             * These two tests ensure that the list view displays the information
+             * of the found todo items but they don't guarantee that todo items
+             * are displayed in the correct order
+             */
+            @Test
+            @DisplayName("Should display the information of the first todo item")
+            void shouldDisplayInformationOfFirstTodoItem() throws Exception {
+                requestBuilder.findAll()
+                        .andExpect(
+                                model().attribute("todoItems",
+                                hasItem(allOf(
+                                        hasProperty("id", equalTo(TODO_ITEM_ONE_ID)),
+                                        hasProperty("title", equalTo(TODO_ITEM_ONE_TITLE)),
+                                        hasProperty("status", equalTo(STATUS_OPEN))
+                                )))
+                        );
+            }
+
+            @Test
+            @DisplayName("Should display the information of the second todo item")
+            void shouldDisplayInformationOfSecondTodoItem() throws Exception {
+                requestBuilder.findAll()
+                        .andExpect(
+                                model().attribute("todoItems",
+                                        hasItem(allOf(
+                                                hasProperty("id", equalTo(TODO_ITEM_TWO_ID)),
+                                                hasProperty("title", equalTo(TODO_ITEM_TWO_TITLE)),
+                                                hasProperty("status", equalTo(STATUS_OPEN))
+                                        )))
+                        );
+            }
+
+            /**
+             * This test ensures that the list view displays the information
+             * of the found todo items in the correct order.
+             */
+            @Test
+            @DisplayName("Should display the information of the first and second todo item in the correct order")
+            void shouldDisplayFirstAndSecondTodoItemInCorrectOrder() throws Exception {
+                requestBuilder.findAll()
+                        .andExpect(
+                                model().attribute("todoItems",
+                                        contains(
+                                                allOf(
+                                                        hasProperty("id", equalTo(TODO_ITEM_ONE_ID)),
+                                                        hasProperty("title", equalTo(TODO_ITEM_ONE_TITLE)),
+                                                        hasProperty("status", equalTo(STATUS_OPEN))
+                                                ),
+                                                allOf(
+                                                        hasProperty("id", equalTo(TODO_ITEM_TWO_ID)),
+                                                        hasProperty("title", equalTo(TODO_ITEM_TWO_TITLE)),
+                                                        hasProperty("status", equalTo(STATUS_OPEN))
+                                                )
+                                        ))
+                        );
+            }
+        }
     }
 
     @Nested

@@ -2,12 +2,15 @@ package net.petrikainulainen.springmvctest.junit5.web;
 
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemCrudService;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemDTO;
+import net.petrikainulainen.springmvctest.junit5.todo.TodoListItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 /**
  * Provides CRUD operations for todo items.
@@ -21,6 +24,20 @@ public class TodoItemCrudController {
     @Autowired
     public TodoItemCrudController(TodoItemCrudService service) {
         this.service = service;
+    }
+
+    /**
+     * Renders the HTML view that displays the information of all
+     * todo items found from the database.
+     * @param model The model that contains the attributes which are
+     *              required to render the HTML view.
+     * @return  The name of the rendered HTML view.
+     */
+    @GetMapping
+    public String findAll(Model model) {
+        List<TodoListItemDTO> todoItems = service.findAll();
+        model.addAttribute("todoItems", todoItems);
+        return "todo-item/list";
     }
 
     /**

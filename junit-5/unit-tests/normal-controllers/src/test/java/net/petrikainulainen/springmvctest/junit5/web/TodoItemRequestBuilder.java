@@ -19,6 +19,16 @@ class TodoItemRequestBuilder {
     }
 
     /**
+     * Creates and sends the HTTP requests which gets the
+     * HTML document that displays the information of all todo items.
+     * @return
+     * @throws Exception
+     */
+    ResultActions findAll() throws Exception {
+        return mockMvc.perform(get("/todo-item"));
+    }
+
+    /**
      * Creates and sends the HTTP request which gets the
      * HTML document that displays the information of the
      * requested task.
