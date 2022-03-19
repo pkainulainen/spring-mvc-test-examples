@@ -52,8 +52,8 @@ class TodoItemCrudControllerTest {
         }
 
         @Nested
-        @DisplayName("When no todo items is found from the database")
-        class WhenNoTodoItemsIsFoundFromDatabase {
+        @DisplayName("When no todo items are found from the database")
+        class WhenNoTodoItemsAreFoundFromDatabase {
 
             @BeforeEach
             void serviceReturnsEmptyList() {
