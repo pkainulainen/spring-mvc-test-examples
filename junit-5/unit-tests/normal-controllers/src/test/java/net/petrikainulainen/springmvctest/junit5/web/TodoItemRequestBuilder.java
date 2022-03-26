@@ -1,9 +1,11 @@
 package net.petrikainulainen.springmvctest.junit5.web;
 
+import net.petrikainulainen.springmvctest.junit5.todo.CreateTodoItemFormDTO;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
  * Creates and sends the HTTP requests which are used
@@ -16,6 +18,21 @@ class TodoItemRequestBuilder {
 
     TodoItemRequestBuilder(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
+    }
+
+    /**
+     * Creates and sends the HTTP requests which submit the created
+     * todo item form.
+     *
+     * @param formObject    The information of the created todo item
+     * @return
+     * @throws Exception
+     */
+    ResultActions create(CreateTodoItemFormDTO formObject) throws Exception {
+        return mockMvc.perform(post("/todo-item")
+                .param("description", formObject.getDescription())
+                .param("title", formObject.getTitle())
+        );
     }
 
     /**

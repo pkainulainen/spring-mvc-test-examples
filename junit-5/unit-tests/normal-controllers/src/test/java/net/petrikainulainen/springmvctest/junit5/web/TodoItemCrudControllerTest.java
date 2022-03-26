@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.support.StaticMessageSource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -12,14 +13,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static info.solidsoft.mockito.java8.AssertionMatcher.assertArg;
 import static net.petrikainulainen.springmvctest.junit5.web.WebTestConfig.*;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class TodoItemCrudControllerTest {
 
+    private StaticMessageSource messageSource = new StaticMessageSource();
     private TodoItemRequestBuilder requestBuilder;
     private TodoItemCrudService service;
 
@@ -27,12 +41,298 @@ class TodoItemCrudControllerTest {
     void configureSystemUnderTest() {
         service = mock(TodoItemCrudService.class);
 
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new TodoItemCrudController(service))
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new TodoItemCrudController(messageSource, service))
                 .setHandlerExceptionResolvers(exceptionResolver())
                 .setLocaleResolver(fixedLocaleResolver())
                 .setViewResolvers(jspViewResolver())
                 .build();
         requestBuilder = new TodoItemRequestBuilder(mockMvc);
+    }
+
+    @Nested
+    @DisplayName("Process the form that creates new todo items")
+    class ProcessFormThatCreatesNewTodoItems {
+
+        private static final String FORM_OBJECT_ALIAS = "todoItem";
+        private static final int MAX_SIZE_DESCRIPTION = 1000;
+        private static final int MAX_SIZE_TITLE = 100;
+
+        private CreateTodoItemFormDTO formObject;
+
+        @Nested
+        @DisplayName("When validation fails")
+        class WhenValidationFails {
+
+            private static final String FORM_FIELD_NAME_DESCRIPTION = "description";
+            private static final String FORM_FIELD_NAME_TITLE = "title";
+
+            private static final String VALIDATION_ERROR_NOT_BLANK = "NotBlank";
+            private static final String VALIDATION_ERROR_SIZE = "Size";
+
+            private static final String VIEW_NAME_FORM_VIEW = "todo-item/create";
+
+            @Nested
+            @DisplayName("When the title and description are missing")
+            class WhenTitleAndDescriptionAreMissing {
+
+                @BeforeEach
+                void createFormObject() {
+                    formObject = new CreateTodoItemFormDTO();
+                }
+
+                @Test
+                @DisplayName("Should return the HTTP status code OK (200)")
+                void shouldReturnHttpStatusCodeOk() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(status().isOk());
+                }
+
+                @Test
+                @DisplayName("Should render the form view")
+                void shouldRenderFormView() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(view().name(VIEW_NAME_FORM_VIEW));
+                }
+
+                @Test
+                @DisplayName("Should display one validation error")
+                void shouldDisplayOneValidationError() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attributeErrorCount(FORM_OBJECT_ALIAS, 1));
+                }
+
+                @Test
+                @DisplayName("Should display a validation error about missing title")
+                void shouldDisplayValidationErrorAboutMissingTitle() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attributeHasFieldErrorCode(
+                                    FORM_OBJECT_ALIAS,
+                                    FORM_FIELD_NAME_TITLE,
+                                    VALIDATION_ERROR_NOT_BLANK
+                            ));
+                }
+
+                @Test
+                @DisplayName("Shouldn't create a new todo item")
+                void shouldNotCreateNewTodoItem() throws Exception {
+                    requestBuilder.create(formObject);
+                    verify(service, never()).create(isA(CreateTodoItemFormDTO.class));
+                }
+            }
+
+            @Nested
+            @DisplayName("When the title and description are empty strings")
+            class WhenTitleAndDescriptionAreEmptyStrings {
+
+                @BeforeEach
+                void createFormObject() {
+                    formObject = new CreateTodoItemFormDTO();
+                    formObject.setDescription("");
+                    formObject.setTitle("");
+                }
+
+                @Test
+                @DisplayName("Should return the HTTP status code OK (200)")
+                void shouldReturnHttpStatusCodeOk() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(status().isOk());
+                }
+
+                @Test
+                @DisplayName("Should render the form view")
+                void shouldRenderFormView() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(view().name(VIEW_NAME_FORM_VIEW));
+                }
+
+                @Test
+                @DisplayName("Should display one validation error")
+                void shouldDisplayOneValidationError() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attributeErrorCount(FORM_OBJECT_ALIAS, 1));
+                }
+
+                @Test
+                @DisplayName("Should display a validation error about empty title")
+                void shouldDisplayValidationErrorAboutEmptyTitle() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attributeHasFieldErrorCode(
+                                    FORM_OBJECT_ALIAS,
+                                    FORM_FIELD_NAME_TITLE,
+                                    VALIDATION_ERROR_NOT_BLANK
+                            ));
+                }
+
+                @Test
+                @DisplayName("Shouldn't create a new todo item")
+                void shouldNotCreateNewTodoItem() throws Exception {
+                    requestBuilder.create(formObject);
+                    verify(service, never()).create(isA(CreateTodoItemFormDTO.class));
+                }
+            }
+
+            @Nested
+            @DisplayName("When the title and description are too long")
+            class WhenTitleAndDescriptionAreTooLong {
+
+                @BeforeEach
+                void createFormObject() {
+                    formObject = new CreateTodoItemFormDTO();
+
+                    String tooLongDescription = WebTestUtil.createStringWithLength(MAX_SIZE_DESCRIPTION + 1);
+                    formObject.setDescription(tooLongDescription);
+
+                    String tooLongTitle = WebTestUtil.createStringWithLength(MAX_SIZE_TITLE + 1);
+                    formObject.setTitle(tooLongTitle);
+                }
+
+                @Test
+                @DisplayName("Should return the HTTP status code OK (200)")
+                void shouldReturnHttpStatusCodeOk() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(status().isOk());
+                }
+
+                @Test
+                @DisplayName("Should render the form view")
+                void shouldRenderFormView() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(view().name(VIEW_NAME_FORM_VIEW));
+                }
+
+                @Test
+                @DisplayName("Should display two validation errors")
+                void shouldDisplayOneValidationError() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attributeErrorCount(FORM_OBJECT_ALIAS, 2));
+                }
+
+                @Test
+                @DisplayName("Should display a validation error about too long description")
+                void shouldDisplayValidationErrorAboutTooLongDescription() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attributeHasFieldErrorCode(
+                                    FORM_OBJECT_ALIAS,
+                                    FORM_FIELD_NAME_DESCRIPTION,
+                                    VALIDATION_ERROR_SIZE
+                            ));
+                }
+
+                @Test
+                @DisplayName("Should display a validation error about too long title")
+                void shouldDisplayValidationErrorAboutTooLongTitle() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attributeHasFieldErrorCode(
+                                    FORM_OBJECT_ALIAS,
+                                    FORM_FIELD_NAME_TITLE,
+                                    VALIDATION_ERROR_SIZE
+                            ));
+                }
+
+                @Test
+                @DisplayName("Shouldn't create a new todo item")
+                void shouldNotCreateNewTodoItem() throws Exception {
+                    requestBuilder.create(formObject);
+                    verify(service, never()).create(isA(CreateTodoItemFormDTO.class));
+                }
+            }
+        }
+
+        @Nested
+        @DisplayName("When validation is successful")
+        class WhenValidationIsSuccessful {
+
+            private static final String FEEDBACK_MESSAGE = "A new todo item was created";
+            private static final String FEEDBACK_MESSAGE_KEY = "feedback.message.todoItem.created";
+
+            private static final String FLASH_ATTRIBUTE_KEY_FEEDBACK_MESSAGE = "feedbackMessage";
+
+            private static final String MODEL_ATTRIBUTE_NAME_ID = "id";
+            private static final String VIEW_NAME_VIEW_TODO_ITEM_VIEW = "redirect:/todo-item/{id}";
+
+            private static final Long ID = 1L;
+
+            @BeforeEach
+            void configureSystemUnderTest() {
+                formObject = createFormObject();
+                configureFeedbackMessage();
+                returnCreatedTodoItem();
+            }
+
+            private CreateTodoItemFormDTO createFormObject() {
+                formObject = new CreateTodoItemFormDTO();
+
+                String description = WebTestUtil.createStringWithLength(MAX_SIZE_DESCRIPTION);
+                formObject.setDescription(description);
+
+                String title = WebTestUtil.createStringWithLength(MAX_SIZE_TITLE);
+                formObject.setTitle(title);
+
+                return formObject;
+            }
+
+            private void configureFeedbackMessage() {
+                messageSource.addMessage(
+                        FEEDBACK_MESSAGE_KEY,
+                        WebTestConfig.LOCALE,
+                        FEEDBACK_MESSAGE
+                );
+            }
+
+            private void returnCreatedTodoItem() {
+                TodoItemDTO created = new TodoItemDTO();
+                created.setId(ID);
+
+                given(service.create(any())).willReturn(created);
+            }
+
+            @Test
+            @DisplayName("Should return the HTTP status code found (302)")
+            void shouldReturnHttpStatusCodeFound() throws Exception {
+                requestBuilder.create(formObject)
+                        .andExpect(status().isFound());
+            }
+
+            @Test
+            @DisplayName("Should redirect the user to the view todo item view")
+            void shouldRedirectUserToViewTodoItemView() throws Exception {
+                requestBuilder.create(formObject)
+                        .andExpect(view().name(VIEW_NAME_VIEW_TODO_ITEM_VIEW))
+                        .andExpect(model().attribute(MODEL_ATTRIBUTE_NAME_ID, equalTo(ID.toString())));
+            }
+
+            @Test
+            @DisplayName("Should create a new flash attribute that contains the correct feedback message")
+            void shouldCreateNewFlashAttributeThatContainsCorrectFeedbackMessage() throws Exception {
+                requestBuilder.create(formObject)
+                        .andExpect(flash().attribute(
+                                FLASH_ATTRIBUTE_KEY_FEEDBACK_MESSAGE,
+                                equalTo(FEEDBACK_MESSAGE)
+                        ));
+            }
+
+            @Test
+            @DisplayName("Should create a new todo item with the correct description")
+            void shouldCreateNewTodoItemWithCorrectDescription() throws Exception {
+                requestBuilder.create(formObject);
+
+                verify(service, times(1)).create(assertArg(
+                        todoItem -> assertThat(todoItem.getDescription())
+                                .isEqualTo(formObject.getDescription())
+                ));
+            }
+
+            @Test
+            @DisplayName("Should create a new todo item with the correct title")
+            void shouldCreateNewTodoItemWithCorrectTitle() throws Exception {
+                requestBuilder.create(formObject);
+
+                verify(service, times(1)).create(assertArg(
+                        todoItem -> assertThat(todoItem.getTitle())
+                                .isEqualTo(formObject.getTitle())
+                ));
+            }
+        }
     }
 
     @Nested

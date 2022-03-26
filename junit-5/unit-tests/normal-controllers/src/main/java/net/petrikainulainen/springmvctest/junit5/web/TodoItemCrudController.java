@@ -1,16 +1,24 @@
 package net.petrikainulainen.springmvctest.junit5.web;
 
+import net.petrikainulainen.springmvctest.junit5.todo.CreateTodoItemFormDTO;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemCrudService;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemDTO;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoListItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Provides CRUD operations for todo items.
@@ -19,11 +27,46 @@ import java.util.List;
 @RequestMapping("/todo-item")
 public class TodoItemCrudController {
 
+    private final MessageSource messageSource;
     private final TodoItemCrudService service;
 
     @Autowired
-    public TodoItemCrudController(TodoItemCrudService service) {
+    public TodoItemCrudController(MessageSource messageSource, TodoItemCrudService service) {
+        this.messageSource = messageSource;
         this.service = service;
+    }
+
+    @PostMapping
+    public String create(@Valid @ModelAttribute("todoItem") CreateTodoItemFormDTO form,
+                         BindingResult bindingResult,
+                         RedirectAttributes redirectAttributes,
+                         Locale currentLocale) {
+        if (bindingResult.hasErrors()) {
+            return "todo-item/create";
+        }
+
+        TodoItemDTO created = service.create(form);
+
+        addFeedbackMessage(
+                redirectAttributes,
+                "feedback.message.todoItem.created",
+                currentLocale,
+                created.getTitle()
+        );
+
+        redirectAttributes.addAttribute("id", created.getId());
+        return "redirect:/todo-item/{id}";
+    }
+
+    private void addFeedbackMessage(RedirectAttributes attributes,
+                                    String messageCode,
+                                    Locale currentLocale,
+                                    Object... messageParameters) {
+        String feedbackMessage = messageSource.getMessage(messageCode,
+                messageParameters,
+                currentLocale
+        );
+        attributes.addFlashAttribute("feedbackMessage", feedbackMessage);
     }
 
     /**

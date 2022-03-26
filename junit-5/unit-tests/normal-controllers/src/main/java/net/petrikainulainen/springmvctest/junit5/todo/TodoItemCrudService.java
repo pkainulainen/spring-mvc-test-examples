@@ -13,6 +13,15 @@ import java.util.List;
 public class TodoItemCrudService {
 
     /**
+     * Creates a new todo item and saves it to the database.
+     * @param input The information of the new todo item.
+     * @return  The information of the created todo item.
+     */
+    public TodoItemDTO create(CreateTodoItemFormDTO input) {
+        return null;
+    }
+
+    /**
      * Finds all todo items from the database.
      * @return  A list that contains the information of the found
      *          todo items. If no todo items is found, this method
