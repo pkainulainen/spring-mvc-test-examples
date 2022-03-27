@@ -18,10 +18,13 @@ import static net.petrikainulainen.springmvctest.junit5.web.WebTestConfig.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.BDDMockito.given;
@@ -95,6 +98,16 @@ class TodoItemCrudControllerTest {
                 }
 
                 @Test
+                @DisplayName("Should display an empty create todo item form")
+                void shouldDisplayEmptyCreateTodoItemForm() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attribute(FORM_OBJECT_ALIAS, allOf(
+                                    hasProperty(FORM_FIELD_NAME_DESCRIPTION, nullValue()),
+                                    hasProperty(FORM_FIELD_NAME_TITLE, nullValue())
+                            )));
+                }
+
+                @Test
                 @DisplayName("Should display one validation error")
                 void shouldDisplayOneValidationError() throws Exception {
                     requestBuilder.create(formObject)
@@ -146,6 +159,16 @@ class TodoItemCrudControllerTest {
                 }
 
                 @Test
+                @DisplayName("Should display an empty create todo item form")
+                void shouldDisplayEmptyCreateTodoItemForm() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attribute(FORM_OBJECT_ALIAS, allOf(
+                                    hasProperty(FORM_FIELD_NAME_DESCRIPTION, is(emptyString())),
+                                    hasProperty(FORM_FIELD_NAME_TITLE, is(emptyString()))
+                            )));
+                }
+
+                @Test
                 @DisplayName("Should display one validation error")
                 void shouldDisplayOneValidationError() throws Exception {
                     requestBuilder.create(formObject)
@@ -175,14 +198,23 @@ class TodoItemCrudControllerTest {
             @DisplayName("When the title and description are too long")
             class WhenTitleAndDescriptionAreTooLong {
 
+                private String tooLongDescription;
+                private String tooLongTitle;
+
                 @BeforeEach
-                void createFormObject() {
+                void configureSystemUnderTest() {
+                    createDescriptionAndTitle();
+                    createFormObject();
+                }
+
+                private void createDescriptionAndTitle() {
+                    tooLongDescription = WebTestUtil.createStringWithLength(MAX_SIZE_DESCRIPTION + 1);
+                    tooLongTitle = WebTestUtil.createStringWithLength(MAX_SIZE_TITLE + 1);
+                }
+
+                private void createFormObject() {
                     formObject = new CreateTodoItemFormDTO();
-
-                    String tooLongDescription = WebTestUtil.createStringWithLength(MAX_SIZE_DESCRIPTION + 1);
                     formObject.setDescription(tooLongDescription);
-
-                    String tooLongTitle = WebTestUtil.createStringWithLength(MAX_SIZE_TITLE + 1);
                     formObject.setTitle(tooLongTitle);
                 }
 
@@ -198,6 +230,16 @@ class TodoItemCrudControllerTest {
                 void shouldRenderFormView() throws Exception {
                     requestBuilder.create(formObject)
                             .andExpect(view().name(VIEW_NAME_FORM_VIEW));
+                }
+
+                @Test
+                @DisplayName("Should display a create todo item form that contains the invalid information")
+                void shouldDisplayCreateTodoItemFormThatContainsInvalidInformation() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attribute(FORM_OBJECT_ALIAS, allOf(
+                                    hasProperty(FORM_FIELD_NAME_DESCRIPTION, equalTo(tooLongDescription)),
+                                    hasProperty(FORM_FIELD_NAME_TITLE, equalTo(tooLongTitle))
+                            )));
                 }
 
                 @Test
