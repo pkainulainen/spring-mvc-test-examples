@@ -53,8 +53,8 @@ class TodoItemCrudControllerTest {
     }
 
     @Nested
-    @DisplayName("Process the form that creates new todo items")
-    class ProcessFormThatCreatesNewTodoItems {
+    @DisplayName("Process the create todo item form")
+    class SubmitCreateTodoItemForm {
 
         private static final String FORM_OBJECT_ALIAS = "todoItem";
         private static final int MAX_LENGTH_DESCRIPTION = 1000;
