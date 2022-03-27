@@ -198,24 +198,14 @@ class TodoItemCrudControllerTest {
             @DisplayName("When the title and description are too long")
             class WhenTitleAndDescriptionAreTooLong {
 
-                private String tooLongDescription;
-                private String tooLongTitle;
+                private final String TOO_LONG_DESCRIPTION = WebTestUtil.createStringWithLength(MAX_LENGTH_DESCRIPTION + 1);
+                private final String TOO_LONG_TITLE = WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE + 1);
 
                 @BeforeEach
-                void configureSystemUnderTest() {
-                    createDescriptionAndTitle();
-                    createFormObject();
-                }
-
-                private void createDescriptionAndTitle() {
-                    tooLongDescription = WebTestUtil.createStringWithLength(MAX_LENGTH_DESCRIPTION + 1);
-                    tooLongTitle = WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE + 1);
-                }
-
-                private void createFormObject() {
+                void createFormObject() {
                     formObject = new CreateTodoItemFormDTO();
-                    formObject.setDescription(tooLongDescription);
-                    formObject.setTitle(tooLongTitle);
+                    formObject.setDescription(TOO_LONG_DESCRIPTION);
+                    formObject.setTitle(TOO_LONG_TITLE);
                 }
 
                 @Test
@@ -237,8 +227,8 @@ class TodoItemCrudControllerTest {
                 void shouldDisplayCreateTodoItemFormThatContainsInvalidInformation() throws Exception {
                     requestBuilder.create(formObject)
                             .andExpect(model().attribute(FORM_OBJECT_ALIAS, allOf(
-                                    hasProperty(FORM_FIELD_NAME_DESCRIPTION, equalTo(tooLongDescription)),
-                                    hasProperty(FORM_FIELD_NAME_TITLE, equalTo(tooLongTitle))
+                                    hasProperty(FORM_FIELD_NAME_DESCRIPTION, equalTo(TOO_LONG_DESCRIPTION)),
+                                    hasProperty(FORM_FIELD_NAME_TITLE, equalTo(TOO_LONG_TITLE))
                             )));
                 }
 
