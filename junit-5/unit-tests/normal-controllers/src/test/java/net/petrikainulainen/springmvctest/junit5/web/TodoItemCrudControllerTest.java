@@ -198,8 +198,8 @@ class TodoItemCrudControllerTest {
             @DisplayName("When the title and description are too long")
             class WhenTitleAndDescriptionAreTooLong {
 
-                private final String TOO_LONG_DESCRIPTION = WebTestUtil.createStringWithLength(MAX_LENGTH_DESCRIPTION + 1);
-                private final String TOO_LONG_TITLE = WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE + 1);
+                private static final String TOO_LONG_DESCRIPTION = WebTestUtil.createStringWithLength(MAX_LENGTH_DESCRIPTION + 1);
+                private static final String TOO_LONG_TITLE = WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE + 1);
 
                 @BeforeEach
                 void createFormObject() {
@@ -283,6 +283,8 @@ class TodoItemCrudControllerTest {
             private static final String VIEW_NAME_VIEW_TODO_ITEM_VIEW = "redirect:/todo-item/{id}";
 
             private static final Long ID = 1L;
+            private static final String DESCRIPTION = WebTestUtil.createStringWithLength(MAX_LENGTH_DESCRIPTION);
+            private static final String TITLE = WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE);
 
             @BeforeEach
             void configureSystemUnderTest() {
@@ -292,14 +294,9 @@ class TodoItemCrudControllerTest {
             }
 
             private CreateTodoItemFormDTO createFormObject() {
-                formObject = new CreateTodoItemFormDTO();
-
-                String description = WebTestUtil.createStringWithLength(MAX_LENGTH_DESCRIPTION);
-                formObject.setDescription(description);
-
-                String title = WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE);
-                formObject.setTitle(title);
-
+                CreateTodoItemFormDTO formObject = new CreateTodoItemFormDTO();
+                formObject.setDescription(DESCRIPTION);
+                formObject.setTitle(TITLE);
                 return formObject;
             }
 
@@ -350,7 +347,7 @@ class TodoItemCrudControllerTest {
 
                 verify(service, times(1)).create(assertArg(
                         todoItem -> assertThat(todoItem.getDescription())
-                                .isEqualTo(formObject.getDescription())
+                                .isEqualTo(DESCRIPTION)
                 ));
             }
 
@@ -361,7 +358,7 @@ class TodoItemCrudControllerTest {
 
                 verify(service, times(1)).create(assertArg(
                         todoItem -> assertThat(todoItem.getTitle())
-                                .isEqualTo(formObject.getTitle())
+                                .isEqualTo(TITLE)
                 ));
             }
         }
