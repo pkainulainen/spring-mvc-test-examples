@@ -195,6 +195,70 @@ class TodoItemCrudControllerTest {
             }
 
             @Nested
+            @DisplayName("When the title and descriptin contain only whitespace characters")
+            class WhenTitleAndDescriptionContainOnlyWhiteSpaceCharacters {
+
+                private static final String DESCRIPTION = "    ";
+                private static final String TITLE = "               ";
+
+                @BeforeEach
+                void createFormObject() {
+                    formObject = new CreateTodoItemFormDTO();
+                    formObject.setDescription(DESCRIPTION);
+                    formObject.setTitle(TITLE);
+                }
+
+                @Test
+                @DisplayName("Should return the HTTP status code OK (200)")
+                void shouldReturnHttpStatusCodeOk() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(status().isOk());
+                }
+
+                @Test
+                @DisplayName("Should render the form view")
+                void shouldRenderFormView() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(view().name(VIEW_NAME_FORM_VIEW));
+                }
+
+                @Test
+                @DisplayName("Should display the createtodo item form with correct description and title")
+                void shouldDisplayCreateTodoItemFormWithCorrectDescriptionAndTitle() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attribute(FORM_OBJECT_ALIAS, allOf(
+                                    hasProperty(FORM_FIELD_NAME_DESCRIPTION, equalTo(DESCRIPTION)),
+                                    hasProperty(FORM_FIELD_NAME_TITLE, equalTo(TITLE))
+                            )));
+                }
+
+                @Test
+                @DisplayName("Should display one validation error")
+                void shouldDisplayOneValidationError() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attributeErrorCount(FORM_OBJECT_ALIAS, 1));
+                }
+
+                @Test
+                @DisplayName("Should display a validation error about empty title")
+                void shouldDisplayValidationErrorAboutEmptyTitle() throws Exception {
+                    requestBuilder.create(formObject)
+                            .andExpect(model().attributeHasFieldErrorCode(
+                                    FORM_OBJECT_ALIAS,
+                                    FORM_FIELD_NAME_TITLE,
+                                    VALIDATION_ERROR_NOT_BLANK
+                            ));
+                }
+
+                @Test
+                @DisplayName("Shouldn't create a new todo item")
+                void shouldNotCreateNewTodoItem() throws Exception {
+                    requestBuilder.create(formObject);
+                    verify(service, never()).create(isA(CreateTodoItemFormDTO.class));
+                }
+            }
+
+            @Nested
             @DisplayName("When the title and description are too long")
             class WhenTitleAndDescriptionAreTooLong {
 
