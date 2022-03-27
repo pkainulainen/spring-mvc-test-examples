@@ -57,8 +57,8 @@ class TodoItemCrudControllerTest {
     class ProcessFormThatCreatesNewTodoItems {
 
         private static final String FORM_OBJECT_ALIAS = "todoItem";
-        private static final int MAX_SIZE_DESCRIPTION = 1000;
-        private static final int MAX_SIZE_TITLE = 100;
+        private static final int MAX_LENGTH_DESCRIPTION = 1000;
+        private static final int MAX_LENGTH_TITLE = 100;
 
         private CreateTodoItemFormDTO formObject;
 
@@ -208,8 +208,8 @@ class TodoItemCrudControllerTest {
                 }
 
                 private void createDescriptionAndTitle() {
-                    tooLongDescription = WebTestUtil.createStringWithLength(MAX_SIZE_DESCRIPTION + 1);
-                    tooLongTitle = WebTestUtil.createStringWithLength(MAX_SIZE_TITLE + 1);
+                    tooLongDescription = WebTestUtil.createStringWithLength(MAX_LENGTH_DESCRIPTION + 1);
+                    tooLongTitle = WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE + 1);
                 }
 
                 private void createFormObject() {
@@ -304,10 +304,10 @@ class TodoItemCrudControllerTest {
             private CreateTodoItemFormDTO createFormObject() {
                 formObject = new CreateTodoItemFormDTO();
 
-                String description = WebTestUtil.createStringWithLength(MAX_SIZE_DESCRIPTION);
+                String description = WebTestUtil.createStringWithLength(MAX_LENGTH_DESCRIPTION);
                 formObject.setDescription(description);
 
-                String title = WebTestUtil.createStringWithLength(MAX_SIZE_TITLE);
+                String title = WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE);
                 formObject.setTitle(title);
 
                 return formObject;
