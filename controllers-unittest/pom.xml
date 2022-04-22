@@ -19,7 +19,7 @@
         <hibernate.version>4.1.9.Final</hibernate.version>
         <jackson.version>2.2.1</jackson.version>
         <slf4j.version>1.6.4</slf4j.version>
-        <spring.version>3.2.3.RELEASE</spring.version>
+        <spring.version>5.3.19</spring.version>
         <spring.data.version>1.3.2.RELEASE</spring.data.version>
 
         <build.profile.id>dev</build.profile.id>
