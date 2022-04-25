@@ -5,17 +5,14 @@ import net.petrikainulainen.springmvctest.junit5.todo.TodoItemCrudService;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemDTO;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoListItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -23,7 +20,7 @@ import java.util.List;
 /**
  * Provides CRUD operations for todo items.
  */
-@Controller
+@RestController
 @RequestMapping("/todo-item")
 public class TodoItemCrudController {
     private final TodoItemCrudService service;
@@ -39,7 +36,6 @@ public class TodoItemCrudController {
      * @return  The information of the created todo item.
      */
     @PostMapping
-    @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     public TodoItemDTO create(@RequestBody @Valid CreateTodoItemDTO input) {
         return service.create(input);
@@ -53,7 +49,6 @@ public class TodoItemCrudController {
      *          an empty list.
      */
     @GetMapping
-    @ResponseBody
     public List<TodoListItemDTO> findAll() {
         return service.findAll();
     }
@@ -65,7 +60,6 @@ public class TodoItemCrudController {
      * @return      The information of the found todo item.
      */
     @GetMapping("{id}")
-    @ResponseBody
     public TodoItemDTO findById(@PathVariable("id") Long id) {
         return service.findById(id);
     }
