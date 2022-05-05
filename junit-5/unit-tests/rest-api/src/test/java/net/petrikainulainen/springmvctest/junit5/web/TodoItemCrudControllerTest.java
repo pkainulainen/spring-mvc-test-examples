@@ -140,7 +140,7 @@ class TodoItemCrudControllerTest {
 
         @Nested
         @DisplayName("When the requested todo item isn't found")
-        class WhenTodoItemIsNotFound {
+        class WhenRequestedTodoItemIsNotFound {
 
             @BeforeEach
             void throwException() {
