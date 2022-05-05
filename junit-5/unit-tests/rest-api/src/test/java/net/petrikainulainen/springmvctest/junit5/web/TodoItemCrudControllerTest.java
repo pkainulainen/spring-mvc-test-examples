@@ -136,7 +136,7 @@ class TodoItemCrudControllerTest {
     @DisplayName("Find todo item by using its id as search criteria")
     class FindById {
 
-        private static final Long ID = 1L;
+        private static final Long TODO_ITEM_ID = 1L;
 
         @Nested
         @DisplayName("When the requested todo item isn't found")
@@ -144,20 +144,20 @@ class TodoItemCrudControllerTest {
 
             @BeforeEach
             void throwException() {
-                given(service.findById(ID)).willThrow(new TodoItemNotFoundException(""));
+                given(service.findById(TODO_ITEM_ID)).willThrow(new TodoItemNotFoundException(""));
             }
 
             @Test
             @DisplayName("Should return the HTTP status code not found (404)")
             void shouldReturnHttpStatusCodeNotFound() throws Exception {
-                requestBuilder.findById(ID)
+                requestBuilder.findById(TODO_ITEM_ID)
                         .andExpect(status().isNotFound());
             }
 
             @Test
             @DisplayName("Should return an HTTP response which has an empty response body")
             void shouldReturnHttpResponseWhichHasEmptyResponseBody() throws Exception {
-                requestBuilder.findById(ID)
+                requestBuilder.findById(TODO_ITEM_ID)
                         .andExpect(content().string(""));
             }
         }
@@ -175,7 +175,7 @@ class TodoItemCrudControllerTest {
             @BeforeEach
             void returnFoundTodoItem() {
                 TodoItemDTO found = new TodoItemDTO();
-                found.setId(ID);
+                found.setId(TODO_ITEM_ID);
                 found.setDescription(DESCRIPTION);
                 found.setStatus(STATUS);
                 found.setTitle(TITLE);
@@ -185,28 +185,28 @@ class TodoItemCrudControllerTest {
                 tag.setName(TAG_NAME);
                 found.setTags(Arrays.asList(tag));
 
-                given(service.findById(ID)).willReturn(found);
+                given(service.findById(TODO_ITEM_ID)).willReturn(found);
             }
 
             @Test
             @DisplayName("Should return the HTTP status code ok (200)")
             void shouldReturnHttpStatusCodeOk() throws Exception {
-                requestBuilder.findById(ID)
+                requestBuilder.findById(TODO_ITEM_ID)
                         .andExpect(status().isOk());
             }
 
             @Test
             @DisplayName("Should return the information of the found todo item as Json")
             void shouldReturnInformationOfFoundTodoItemAsJson() throws Exception {
-                requestBuilder.findById(ID)
+                requestBuilder.findById(TODO_ITEM_ID)
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON));
             }
 
             @Test
             @DisplayName("Should return the information of the found todo item")
             void shouldReturnInformationOfFoundTodoItem() throws Exception {
-                requestBuilder.findById(ID)
-                        .andExpect(jsonPath("$.id", equalTo(ID.intValue())))
+                requestBuilder.findById(TODO_ITEM_ID)
+                        .andExpect(jsonPath("$.id", equalTo(TODO_ITEM_ID.intValue())))
                         .andExpect(jsonPath("$.description", equalTo(DESCRIPTION)))
                         .andExpect(jsonPath("$.status", equalTo(STATUS.name())))
                         .andExpect(jsonPath("$.title", equalTo(TITLE)));
@@ -215,14 +215,14 @@ class TodoItemCrudControllerTest {
             @Test
             @DisplayName("Should return a todo item that has one tag")
             void shouldReturnTodoItemThatHasOneTag() throws Exception {
-                requestBuilder.findById(ID)
+                requestBuilder.findById(TODO_ITEM_ID)
                         .andExpect(jsonPath("$.tags", hasSize(1)));
             }
 
             @Test
             @DisplayName("Should return the information of the found tag")
             void shouldReturnInformationOfFoundTag() throws Exception {
-                requestBuilder.findById(ID)
+                requestBuilder.findById(TODO_ITEM_ID)
                         .andExpect(jsonPath("$.tags[0].id", equalTo(TAG_ID.intValue())))
                         .andExpect(jsonPath("$.tags[0].name", equalTo(TAG_NAME)));
             }
