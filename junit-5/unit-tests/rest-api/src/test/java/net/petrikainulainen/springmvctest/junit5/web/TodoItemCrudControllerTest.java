@@ -62,7 +62,7 @@ class TodoItemCrudControllerTest {
         }
 
         @Nested
-        @DisplayName("When no todo items are found from the database")
+        @DisplayName("When no todo items are found")
         class WhenNoTodoItemsAreFound {
 
             @BeforeEach
@@ -79,7 +79,7 @@ class TodoItemCrudControllerTest {
         }
 
         @Nested
-        @DisplayName("When two todo items are found from the database")
+        @DisplayName("When two todo items are found")
         class WhenTwoTodoItemsAreFound {
 
             private static final Long FIRST_TODO_ITEM_ID = 1L;
