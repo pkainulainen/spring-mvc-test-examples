@@ -55,8 +55,8 @@ class TodoItemCrudControllerTest {
         }
 
         @Test
-        @DisplayName("Should return the found todo items as Json")
-        void shouldReturnFoundTodoItemAsJson() throws Exception {
+        @DisplayName("Should return the found todo items as JSON")
+        void shouldReturnFoundTodoItemAsJSON() throws Exception {
             requestBuilder.findAll()
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON));
         }
