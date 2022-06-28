@@ -1,5 +1,6 @@
 package net.petrikainulainen.springmvctest.junit5.web;
 
+import net.petrikainulainen.springmvctest.junit5.todo.CreateTodoItemDTO;
 import net.petrikainulainen.springmvctest.junit5.todo.TagDTO;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemCrudService;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemDTO;
@@ -17,11 +18,19 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static info.solidsoft.mockito.java8.AssertionMatcher.assertArg;
 import static net.petrikainulainen.springmvctest.junit5.web.WebTestConfig.objectMapperHttpMessageConverter;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,6 +50,262 @@ class TodoItemCrudControllerTest {
                 .setMessageConverters(objectMapperHttpMessageConverter())
                 .build();
         requestBuilder = new TodoItemRequestBuilder(mockMvc);
+    }
+
+    @Nested
+    @DisplayName("Create a new todo item")
+    class Create {
+
+        private static final int MAX_LENGTH_DESCRIPTION = 1000;
+        private static final int MAX_LENGTH_TITLE = 100;
+
+        private CreateTodoItemDTO input;
+
+        @Nested
+        @DisplayName("When the information of the created todo item isn't valid")
+        class WhenInvalidInformationIsProvided {
+
+            private static final String VALIDATION_ERROR_CODE_EMPTY_VALUE = "NotBlank";
+            private static final String VALIDATION_ERROR_CODE_MISSING_VALUE = "NotBlank";
+            private static final String VALIDATION_ERROR_CODE_TOO_LONG_VALUE = "Size";
+
+            @Nested
+            @DisplayName("When the field values are missing")
+            class WhenFieldValuesAreMissing {
+
+                @BeforeEach
+                void CreateInputWithMissingFieldValues() {
+                    input = new CreateTodoItemDTO();
+                }
+
+                @Test
+                @DisplayName("Should return the HTTP status code bad request (400)")
+                void shouldReturnHttpStatusCodeBadRequest() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(status().isBadRequest());
+                }
+
+                @Test
+                @DisplayName("Should return validation errors as JSON")
+                void shouldReturnValidationErrorsAsJson() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                }
+
+                @Test
+                @DisplayName("Should return one validation error")
+                void shouldReturnOneValidationError() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(jsonPath("$.fieldErrors", hasSize(1)));
+                }
+
+                @Test
+                @DisplayName("Should return a validation error about missing title")
+                void shouldReturnValidationErrorAboutMissingTitle() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(jsonPath(
+                                    "$.fieldErrors[?(@.field == 'title')].errorCode",
+                                    contains(VALIDATION_ERROR_CODE_MISSING_VALUE)
+                            ));
+                }
+
+                @Test
+                @DisplayName("Shouldn't create a new todo item")
+                void shouldNotCreateNewTodoItem() throws Exception {
+                    requestBuilder.create(input);
+
+                    verify(service, never()).create(any());
+                }
+            }
+
+            @Nested
+            @DisplayName("When the field values are empty strings")
+            class WhenFieldValuesAreEmptyStrings {
+
+                @BeforeEach
+                void createInputWithEmptyFieldValues() {
+                    input = new CreateTodoItemDTO();
+                    input.setDescription("");
+                    input.setTitle("");
+                }
+
+                @Test
+                @DisplayName("Should return the HTTP status code bad request (400)")
+                void shouldReturnHttpStatusCodeBadRequest() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(status().isBadRequest());
+                }
+
+                @Test
+                @DisplayName("Should return validation errors as JSON")
+                void shouldReturnValidationErrorsAsJson() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                }
+
+                @Test
+                @DisplayName("Should return one validation error")
+                void shouldReturnOneValidationError() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(jsonPath("$.fieldErrors", hasSize(1)));
+                }
+
+                @Test
+                @DisplayName("Should return a validation error about empty title")
+                void shouldReturnValidationErrorAboutEmptyTitle() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(jsonPath(
+                                    "$.fieldErrors[?(@.field == 'title')].errorCode",
+                                    contains(VALIDATION_ERROR_CODE_EMPTY_VALUE)
+                            ));
+                }
+
+                @Test
+                @DisplayName("Shouldn't create a new todo item")
+                void shouldNotCreateNewTodoItem() throws Exception {
+                    requestBuilder.create(input);
+
+                    verify(service, never()).create(any());
+                }
+            }
+
+            @Nested
+            @DisplayName("When the field values are too long")
+            class WhenFieldValuesAreTooLong {
+
+                @BeforeEach
+                void createInputWithTooLongFieldValues() {
+                    input = new CreateTodoItemDTO();
+                    input.setDescription(WebTestUtil.createStringWithLength(MAX_LENGTH_DESCRIPTION + 1));
+                    input.setTitle(WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE + 1));
+                }
+
+                @Test
+                @DisplayName("Should return the HTTP status code bad request (400)")
+                void shouldReturnHttpStatusCodeBadRequest() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(status().isBadRequest());
+                }
+
+                @Test
+                @DisplayName("Should return validation errors as JSON")
+                void shouldReturnValidationErrorsAsJson() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                }
+
+                @Test
+                @DisplayName("Should return two validation error")
+                void shouldReturnTwoValidationErrors() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(jsonPath("$.fieldErrors", hasSize(2)));
+                }
+
+                @Test
+                @DisplayName("Should return a validation error about too long description")
+                void shouldReturnValidationErrorAboutTooLongDescription() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(jsonPath(
+                                    "$.fieldErrors[?(@.field == 'description')].errorCode",
+                                    contains(VALIDATION_ERROR_CODE_TOO_LONG_VALUE)
+                            ));
+                }
+
+                @Test
+                @DisplayName("Should return a validation error about too long title")
+                void shouldReturnValidationErrorAboutTooLongTitle() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(jsonPath(
+                                    "$.fieldErrors[?(@.field == 'title')].errorCode",
+                                    contains(VALIDATION_ERROR_CODE_TOO_LONG_VALUE)
+                            ));
+                }
+
+                @Test
+                @DisplayName("Shouldn't create a new todo item")
+                void shouldNotCreateNewTodoItem() throws Exception {
+                    requestBuilder.create(input);
+
+                    verify(service, never()).create(any());
+                }
+            }
+        }
+
+        @Nested
+        @DisplayName("When the information of the created todo item is valid")
+        class WhenValidInformationIsProvided {
+
+            private final String DESCRIPTION = WebTestUtil.createStringWithLength(MAX_LENGTH_DESCRIPTION);
+            private final Long ID = 1L;
+            private final String TITLE = WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE);
+
+            @BeforeEach
+            void configureSystemUnderTest() {
+                input = createInputWithValidInformation();
+                returnCreatedTodoItem();
+            }
+
+            private CreateTodoItemDTO createInputWithValidInformation() {
+                CreateTodoItemDTO input = new CreateTodoItemDTO();
+                input.setDescription(DESCRIPTION);
+                input.setTitle(TITLE);
+                return input;
+            }
+
+            private void returnCreatedTodoItem() {
+                TodoItemDTO created = new TodoItemDTO();
+                created.setId(ID);
+                created.setDescription(DESCRIPTION);
+                created.setStatus(TodoItemStatus.OPEN);
+                created.setTags(new ArrayList<>());
+                created.setTitle(TITLE);
+
+                given(service.create(any())).willReturn(created);
+            }
+
+            @Test
+            @DisplayName("Should return the HTTP status status code created (201)")
+            void shouldReturnHttpStatusCodeCreated() throws Exception {
+                requestBuilder.create(input)
+                        .andExpect(status().isCreated());
+            }
+
+            @Test
+            @DisplayName("Should return the information of the created todo item as JSON")
+            void shouldReturnInformationOfCreatedTodoItemAsJSON() throws Exception {
+                requestBuilder.create(input)
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+            }
+
+            @Test
+            @DisplayName("Should return the information of the created todo item")
+            void shouldReturnInformationOfCreatedTodoItem() throws Exception {
+                requestBuilder.create(input)
+                        .andExpect(jsonPath("$.id", equalTo(ID.intValue())))
+                        .andExpect(jsonPath("$.description", equalTo(DESCRIPTION)))
+                        .andExpect(jsonPath("$.status", equalTo(TodoItemStatus.OPEN.name())))
+                        .andExpect(jsonPath("$.tags", hasSize(0)))
+                        .andExpect(jsonPath("$.title", equalTo(TITLE)));
+            }
+
+            @Test
+            @DisplayName("Should create a new todo item with the correct description")
+            void shouldCreateNewTodoItemWithCorrectDescription() throws Exception {
+                requestBuilder.create(input);
+                verify(service, times(1)).create(assertArg(
+                        created -> assertThat(created.getDescription()).isEqualTo(DESCRIPTION)
+                ));
+            }
+
+            @Test
+            @DisplayName("Should create a new todo item with the correct title")
+            void shouldCreateNewTodoItemWithCorrectTitle() throws Exception {
+                requestBuilder.create(input);
+                verify(service, times(1)).create(assertArg(
+                        created -> assertThat(created.getTitle()).isEqualTo(TITLE)
+                ));
+            }
+        }
     }
 
     @Nested
