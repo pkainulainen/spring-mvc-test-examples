@@ -170,6 +170,57 @@ class TodoItemCrudControllerTest {
             }
 
             @Nested
+            @DisplayName("When the field values contain only whitespace characters")
+            class WhenFieldValuesContainOnlyWhitespaceCharacters {
+
+                @BeforeEach
+                void createInputWithEmptyFieldValues() {
+                    input = new CreateTodoItemDTO();
+                    input.setDescription("      ");
+                    input.setTitle("            ");
+                }
+
+                @Test
+                @DisplayName("Should return the HTTP status code bad request (400)")
+                void shouldReturnHttpStatusCodeBadRequest() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(status().isBadRequest());
+                }
+
+                @Test
+                @DisplayName("Should return validation errors as JSON")
+                void shouldReturnValidationErrorsAsJson() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                }
+
+                @Test
+                @DisplayName("Should return one validation error")
+                void shouldReturnOneValidationError() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(jsonPath("$.fieldErrors", hasSize(1)));
+                }
+
+                @Test
+                @DisplayName("Should return a validation error about empty title")
+                void shouldReturnValidationErrorAboutEmptyTitle() throws Exception {
+                    requestBuilder.create(input)
+                            .andExpect(jsonPath(
+                                    "$.fieldErrors[?(@.field == 'title')].errorCode",
+                                    contains(VALIDATION_ERROR_CODE_EMPTY_VALUE)
+                            ));
+                }
+
+                @Test
+                @DisplayName("Shouldn't create a new todo item")
+                void shouldNotCreateNewTodoItem() throws Exception {
+                    requestBuilder.create(input);
+
+                    verify(service, never()).create(any());
+                }
+            }
+
+            @Nested
             @DisplayName("When the field values are too long")
             class WhenFieldValuesAreTooLong {
 
