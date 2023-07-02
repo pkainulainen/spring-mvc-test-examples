@@ -1,5 +1,6 @@
 package net.petrikainulainen.springmvctest.junit5.web;
 
+import jakarta.validation.Valid;
 import net.petrikainulainen.springmvctest.junit5.todo.CreateTodoItemDTO;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemCrudService;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemDTO;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
