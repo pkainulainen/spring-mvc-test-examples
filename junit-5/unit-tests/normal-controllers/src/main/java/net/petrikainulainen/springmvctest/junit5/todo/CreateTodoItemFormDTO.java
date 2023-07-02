@@ -1,7 +1,7 @@
 package net.petrikainulainen.springmvctest.junit5.todo;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 /**
  * Contains the information of a new todo item that's
