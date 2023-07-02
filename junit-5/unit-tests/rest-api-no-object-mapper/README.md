@@ -1,7 +1,8 @@
-# Writing Unit Tests for a Spring MVC REST API
+# How to Write MockMvc Tests Without ObjectMapper
 
-This example application demonstrates how we can write unit tests for a
-Spring MVC REST API by using JUnit 5 and the Spring MVC Test framework.
+This example demonstrates how you can write unit tests for a Spring MVC REST API by using JUnit 5 and the Spring
+MVC Test framework. Also, this example doesn't use ObjectMapper when it creates the request body that's send to 
+the system under test.
 
 ## Running Unit Tests With Maven
 
