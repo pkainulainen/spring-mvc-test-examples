@@ -1,5 +1,6 @@
 package net.petrikainulainen.springmvctest.junit5.web;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
@@ -38,7 +39,8 @@ public final class WebTestConfig {
      * @return
      */
     public static ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        return new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 }
 

@@ -23,6 +23,7 @@ class TodoItemRequestBuilder {
 
     static final String TEMPLATE_VARIABLE_DESCRIPTION = "description";
     static final String TEMPLATE_VARIABLE_TITLE = "title";
+    static final String TEMPLATE_VARIABLE_UNKNOWN  = "unknown";
 
     private final MockMvc mockMvc;
     private final TemplateEngine templateEngine;
@@ -112,11 +113,21 @@ class TodoItemRequestBuilder {
         TODO_ITEM(
                 """
                {
-                "description":"[[${description}]]",
-                "title":"[[${title}]]"
+                    "description":"[[${description}]]",
+                    "title":"[[${title}]]"
+               }
+                """
+        ),
+        TODO_ITEM_WITH_UNKNOWN_PROPERTY(
+                """
+                {
+                    "description":"[[${description}]]",
+                    "title":"[[${title}]]",
+                    "unknown":"[[${unknown}]]"
                }
                 """
         );
+
 
         private final String template;
 

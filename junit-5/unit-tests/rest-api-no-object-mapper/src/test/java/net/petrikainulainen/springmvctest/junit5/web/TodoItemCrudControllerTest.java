@@ -21,8 +21,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import static info.solidsoft.mockito.java8.AssertionMatcher.assertArg;
-import static net.petrikainulainen.springmvctest.junit5.web.TodoItemRequestBuilder.TEMPLATE_VARIABLE_DESCRIPTION;
-import static net.petrikainulainen.springmvctest.junit5.web.TodoItemRequestBuilder.TEMPLATE_VARIABLE_TITLE;
+import static net.petrikainulainen.springmvctest.junit5.web.TodoItemRequestBuilder.*;
 import static net.petrikainulainen.springmvctest.junit5.web.WebTestConfig.objectMapperHttpMessageConverter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -285,64 +284,137 @@ class TodoItemCrudControllerTest {
             private final Long ID = 1L;
             private final String TITLE = WebTestUtil.createStringWithLength(MAX_LENGTH_TITLE);
 
-            private final Map<String, Object> TEMPLATE_VARIABLES = Map.of(
-                    TEMPLATE_VARIABLE_DESCRIPTION, DESCRIPTION,
-                    TEMPLATE_VARIABLE_TITLE, TITLE
-            );
+            @Nested
+            @DisplayName("When the created todo item doesn't have unknown properties")
+            class WhenCreatedTodoItemDoesNotHaveUnknownProperties {
 
-            @BeforeEach
-            void returnCreatedTodoItem() {
-                TodoItemDTO created = new TodoItemDTO();
-                created.setId(ID);
-                created.setDescription(DESCRIPTION);
-                created.setStatus(TodoItemStatus.OPEN);
-                created.setTags(new ArrayList<>());
-                created.setTitle(TITLE);
+                private final Map<String, Object> TEMPLATE_VARIABLES = Map.of(
+                        TEMPLATE_VARIABLE_DESCRIPTION, DESCRIPTION,
+                        TEMPLATE_VARIABLE_TITLE, TITLE
+                );
 
-                given(service.create(any())).willReturn(created);
+                @BeforeEach
+                void returnCreatedTodoItem() {
+                    TodoItemDTO created = new TodoItemDTO();
+                    created.setId(ID);
+                    created.setDescription(DESCRIPTION);
+                    created.setStatus(TodoItemStatus.OPEN);
+                    created.setTags(new ArrayList<>());
+                    created.setTitle(TITLE);
+
+                    given(service.create(any())).willReturn(created);
+                }
+
+                @Test
+                @DisplayName("Should return the HTTP status status code created (201)")
+                void shouldReturnHttpStatusCodeCreated() throws Exception {
+                    requestBuilder.create(RequestBodyTemplate.TODO_ITEM, TEMPLATE_VARIABLES)
+                            .andExpect(status().isCreated());
+                }
+
+                @Test
+                @DisplayName("Should return the information of the created todo item as JSON")
+                void shouldReturnInformationOfCreatedTodoItemAsJSON() throws Exception {
+                    requestBuilder.create(RequestBodyTemplate.TODO_ITEM, TEMPLATE_VARIABLES)
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                }
+
+                @Test
+                @DisplayName("Should return the information of the created todo item")
+                void shouldReturnInformationOfCreatedTodoItem() throws Exception {
+                    requestBuilder.create(RequestBodyTemplate.TODO_ITEM, TEMPLATE_VARIABLES)
+                            .andExpect(jsonPath("$.id", equalTo(ID.intValue())))
+                            .andExpect(jsonPath("$.description", equalTo(DESCRIPTION)))
+                            .andExpect(jsonPath("$.status", equalTo(TodoItemStatus.OPEN.name())))
+                            .andExpect(jsonPath("$.tags", hasSize(0)))
+                            .andExpect(jsonPath("$.title", equalTo(TITLE)));
+                }
+
+                @Test
+                @DisplayName("Should create a new todo item with the correct description")
+                void shouldCreateNewTodoItemWithCorrectDescription() throws Exception {
+                    requestBuilder.create(RequestBodyTemplate.TODO_ITEM, TEMPLATE_VARIABLES);
+                    verify(service, times(1)).create(assertArg(
+                            created -> assertThat(created.getDescription()).isEqualTo(DESCRIPTION)
+                    ));
+                }
+
+                @Test
+                @DisplayName("Should create a new todo item with the correct title")
+                void shouldCreateNewTodoItemWithCorrectTitle() throws Exception {
+                    requestBuilder.create(RequestBodyTemplate.TODO_ITEM, TEMPLATE_VARIABLES);
+                    verify(service, times(1)).create(assertArg(
+                            created -> assertThat(created.getTitle()).isEqualTo(TITLE)
+                    ));
+                }
             }
 
-            @Test
-            @DisplayName("Should return the HTTP status status code created (201)")
-            void shouldReturnHttpStatusCodeCreated() throws Exception {
-                requestBuilder.create(RequestBodyTemplate.TODO_ITEM, TEMPLATE_VARIABLES)
-                        .andExpect(status().isCreated());
-            }
+            @Nested
+            @DisplayName("When the created todo item has an unknown property")
+            class WhenCreatedTodoItemHasUnknownProperty {
 
-            @Test
-            @DisplayName("Should return the information of the created todo item as JSON")
-            void shouldReturnInformationOfCreatedTodoItemAsJSON() throws Exception {
-                requestBuilder.create(RequestBodyTemplate.TODO_ITEM, TEMPLATE_VARIABLES)
-                        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-            }
+                private static final String UNKOWN_VALUE = "unknownValue";
 
-            @Test
-            @DisplayName("Should return the information of the created todo item")
-            void shouldReturnInformationOfCreatedTodoItem() throws Exception {
-                requestBuilder.create(RequestBodyTemplate.TODO_ITEM, TEMPLATE_VARIABLES)
-                        .andExpect(jsonPath("$.id", equalTo(ID.intValue())))
-                        .andExpect(jsonPath("$.description", equalTo(DESCRIPTION)))
-                        .andExpect(jsonPath("$.status", equalTo(TodoItemStatus.OPEN.name())))
-                        .andExpect(jsonPath("$.tags", hasSize(0)))
-                        .andExpect(jsonPath("$.title", equalTo(TITLE)));
-            }
+                private final Map<String, Object> TEMPLATE_VARIABLES = Map.of(
+                        TEMPLATE_VARIABLE_DESCRIPTION, DESCRIPTION,
+                        TEMPLATE_VARIABLE_TITLE, TITLE,
+                        TEMPLATE_VARIABLE_UNKNOWN, UNKOWN_VALUE
+                );
 
-            @Test
-            @DisplayName("Should create a new todo item with the correct description")
-            void shouldCreateNewTodoItemWithCorrectDescription() throws Exception {
-                requestBuilder.create(RequestBodyTemplate.TODO_ITEM, TEMPLATE_VARIABLES);
-                verify(service, times(1)).create(assertArg(
-                        created -> assertThat(created.getDescription()).isEqualTo(DESCRIPTION)
-                ));
-            }
+                @BeforeEach
+                void returnCreatedTodoItem() {
+                    TodoItemDTO created = new TodoItemDTO();
+                    created.setId(ID);
+                    created.setDescription(DESCRIPTION);
+                    created.setStatus(TodoItemStatus.OPEN);
+                    created.setTags(new ArrayList<>());
+                    created.setTitle(TITLE);
 
-            @Test
-            @DisplayName("Should create a new todo item with the correct title")
-            void shouldCreateNewTodoItemWithCorrectTitle() throws Exception {
-                requestBuilder.create(RequestBodyTemplate.TODO_ITEM, TEMPLATE_VARIABLES);
-                verify(service, times(1)).create(assertArg(
-                        created -> assertThat(created.getTitle()).isEqualTo(TITLE)
-                ));
+                    given(service.create(any())).willReturn(created);
+                }
+
+                @Test
+                @DisplayName("Should return the HTTP status status code created (201)")
+                void shouldReturnHttpStatusCodeCreated() throws Exception {
+                    requestBuilder.create(RequestBodyTemplate.TODO_ITEM_WITH_UNKNOWN_PROPERTY, TEMPLATE_VARIABLES)
+                            .andExpect(status().isCreated());
+                }
+
+                @Test
+                @DisplayName("Should return the information of the created todo item as JSON")
+                void shouldReturnInformationOfCreatedTodoItemAsJSON() throws Exception {
+                    requestBuilder.create(RequestBodyTemplate.TODO_ITEM_WITH_UNKNOWN_PROPERTY, TEMPLATE_VARIABLES)
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                }
+
+                @Test
+                @DisplayName("Should return the information of the created todo item")
+                void shouldReturnInformationOfCreatedTodoItem() throws Exception {
+                    requestBuilder.create(RequestBodyTemplate.TODO_ITEM_WITH_UNKNOWN_PROPERTY, TEMPLATE_VARIABLES)
+                            .andExpect(jsonPath("$.id", equalTo(ID.intValue())))
+                            .andExpect(jsonPath("$.description", equalTo(DESCRIPTION)))
+                            .andExpect(jsonPath("$.status", equalTo(TodoItemStatus.OPEN.name())))
+                            .andExpect(jsonPath("$.tags", hasSize(0)))
+                            .andExpect(jsonPath("$.title", equalTo(TITLE)));
+                }
+
+                @Test
+                @DisplayName("Should create a new todo item with the correct description")
+                void shouldCreateNewTodoItemWithCorrectDescription() throws Exception {
+                    requestBuilder.create(RequestBodyTemplate.TODO_ITEM_WITH_UNKNOWN_PROPERTY, TEMPLATE_VARIABLES);
+                    verify(service, times(1)).create(assertArg(
+                            created -> assertThat(created.getDescription()).isEqualTo(DESCRIPTION)
+                    ));
+                }
+
+                @Test
+                @DisplayName("Should create a new todo item with the correct title")
+                void shouldCreateNewTodoItemWithCorrectTitle() throws Exception {
+                    requestBuilder.create(RequestBodyTemplate.TODO_ITEM_WITH_UNKNOWN_PROPERTY, TEMPLATE_VARIABLES);
+                    verify(service, times(1)).create(assertArg(
+                            created -> assertThat(created.getTitle()).isEqualTo(TITLE)
+                    ));
+                }
             }
         }
     }
