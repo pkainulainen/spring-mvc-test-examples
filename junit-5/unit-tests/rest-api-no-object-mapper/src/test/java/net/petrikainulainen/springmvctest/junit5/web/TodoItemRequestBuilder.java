@@ -90,19 +90,19 @@ class TodoItemRequestBuilder {
     /**
      * Specifies the different request body templates which are supported
      * by our request builder class. We should use an enum instead of just
-     * passing a string to our request builder methods because:
+     * passing a string to our request builder method because:
      * <ul>
      *     <li>
      *          If we use an enum, we ensure that our request builder is responsible of building
      *          the request body by using the information provided by the user of our request builder.
-     *          If our request builder methods would take the template as a {@link String} object, the
+     *          If our request builder method would take the template as a {@link String} object, the
      *          user of our request builder would be responsible of building a part of the request
      *          (the request body).
      *     </li>
      *     <li>
      *         If we keep our request body templates in one place, they are easier to maintain. If we have
      *         to make changes to these templates, we don't have to search our templates from different test
-     *         classes. We can simply open our request builder class and make the required changes to the template.
+     *         classes. We can simply open our request builder class and make the required changes to the templates.
      *         However, we might still have to make changes to the template variables which are configured in our
      *         test classes.
      *     </li>
