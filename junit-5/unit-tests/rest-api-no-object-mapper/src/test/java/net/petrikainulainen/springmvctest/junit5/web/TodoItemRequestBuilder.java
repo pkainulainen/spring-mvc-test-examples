@@ -52,6 +52,7 @@ class TodoItemRequestBuilder {
         );
 
     }
+
     private String buildRequestBody(RequestBodyTemplate template, Map<String, Object> variables) {
         var context = new Context();
         var variableKeys = variables.keySet();
@@ -92,18 +93,17 @@ class TodoItemRequestBuilder {
      * passing a string to our request builder methods because:
      * <ul>
      *     <li>
-     *          Using an enum nsures that our request builder is still responsible
-     *          of building the request body by using the information provided by
-     *          the user our request builder. If our request builder methods would take
-     *          the tamplete as a {@link String} object, the user of our request builder
-     *          would be responsible of building parts of the request (the request body).
+     *          If we use an enum, we ensure that our request builder is responsible of building
+     *          the request body by using the information provided by the user of our request builder.
+     *          If our request builder methods would take the template as a {@link String} object, the
+     *          user of our request builder would be responsible of building a part of the request
+     *          (the request body).
      *     </li>
      *     <li>
-     *         Keeping our request body templates in one place makes them easier to
-     *         maintain. If we have to make changes to these templates, we don't have to
-     *         look our templates from different test classes. We can simply open our request
-     *         builder class and make the required changes to the template. However, we might
-     *         still have make changes to the template variables which are configured in our
+     *         If we keep our request body templates in one place, they are easier to maintain. If we have
+     *         to make changes to these templates, we don't have to search our templates from different test
+     *         classes. We can simply open our request builder class and make the required changes to the template.
+     *         However, we might still have to make changes to the template variables which are configured in our
      *         test classes.
      *     </li>
      * </ul>
