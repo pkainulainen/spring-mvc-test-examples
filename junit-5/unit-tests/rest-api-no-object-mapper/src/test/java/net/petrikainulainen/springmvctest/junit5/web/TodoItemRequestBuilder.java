@@ -55,6 +55,7 @@ class TodoItemRequestBuilder {
     private String buildRequestBody(RequestBodyTemplate template, Map<String, Object> variables) {
         var context = new Context();
         var variableKeys = variables.keySet();
+
         for (String key: variableKeys) {
             context.setVariable(key, variables.get(key));
         }
