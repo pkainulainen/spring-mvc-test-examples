@@ -157,6 +157,8 @@
 				the database after the jOOQ code generation has been run. This ensures that the
 				jOOQ code generation is run against the same database that's used by our application
 				and integration tests.
+
+				See: https://blog.jooq.org/using-testcontainers-to-generate-jooq-code/
 			-->
 			<plugin>
 				<groupId>org.codehaus.gmaven</groupId>
