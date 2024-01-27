@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.2.2</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>net.petrikainulainen.springmvctest.junit5.integration</groupId>
+	<artifactId>repositories-jooq</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Writing Integration Tests for jOOQ Repositories</name>
+	<description>
+		This project demonstrates how you can write integration tests for
+		Spring powered jOOQ repositories.
+	</description>
+	<properties>
+		<assertj.version>3.25.1</assertj.version>
+		<!-- We have to update Flyway if we want official support for PostgreSQL 16.X -->
+		<flyway.version>10.6.0</flyway.version>
+		<jdk.version>21</jdk.version>
+
+		<database.username>springmvctest</database.username>
+		<database.password>springmvctest</database.password>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<skip.unit.tests>true</skip.unit.tests>
+		<skip.integration.tests>true</skip.integration.tests>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>application</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>unit-tests</id>
+			<properties>
+				<skip.unit.tests>false</skip.unit.tests>
+			</properties>
+		</profile>
+		<profile>
+			<id>integration-tests</id>
+			<properties>
+				<skip.integration.tests>false</skip.integration.tests>
+				<skip.unit.tests>true</skip.unit.tests>
+			</properties>
+		</profile>
+		<profile>
+			<id>all-tests</id>
+			<properties>
+				<skip.integration.tests>false</skip.integration.tests>
+				<skip.unit.tests>false</skip.unit.tests>
+			</properties>
+		</profile>
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+			<version>${flyway.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jooq</artifactId>
+		</dependency>
+		<!-- Testing dependencies -->
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-db</artifactId>
+			<version>2.0.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!--
+				Adds the source and resource directories of integration tests
+				to our Maven build.
+			-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.5.0</version>
+				<executions>
+					<execution>
+						<id>add-integration-test-sources</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/integration-test/java</source>
+							</sources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>add-integration-test-resources</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>add-test-resource</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<filtering>true</filtering>
+									<directory>src/integration-test/resources</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<!--
+				Starts the PostgreSQL database before the jOOQ code generation is run and stops
+				the database after the jOOQ code generation has been run. This ensures that the
+				jOOQ code generation is run against the same database that's used by our application
+				and integration tests.
+			-->
+			<plugin>
+				<groupId>org.codehaus.gmaven</groupId>
+				<artifactId>groovy-maven-plugin</artifactId>
+				<version>2.1.1</version>
+				<executions>
+					<execution>
+						<id>testcontainer-start</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<source>
+								db = new org.testcontainers.containers.PostgreSQLContainer("postgres:16.1")
+										.withUsername("${database.username}")
+										.withDatabaseName("springmvctest-db-maven")
+										.withPassword("${database.password}");
+
+								db.start();
+								project.properties.setProperty('database.url', db.getJdbcUrl());
+								project.properties.setProperty('testcontainer.containerid', db.getContainerId());
+								project.properties.setProperty('testcontainer.imageName', db.getDockerImageName());
+							</source>
+						</configuration>
+					</execution>
+					<execution>
+						<id>testcontainer-stop</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<source>
+								containerId = "${testcontainer.containerid}"
+								imageName = "${testcontainer.imageName}"
+								println("Stopping testcontainer $containerId - $imageName")
+								org.testcontainers.utility.ResourceReaper
+										.instance()
+										.stopAndRemoveContainer(containerId, imageName);
+							</source>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.testcontainers</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>${testcontainers.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<!--
+				Runs the database migrations after the PostgreSQL database has been
+				started. This plugin ensures that the jOOQ code generation is run
+				against a database that has the same structure as the database which
+				is used by our application and integration tests.
+			-->
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>${flyway.version}</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>migrate</goal>
+						</goals>
+						<configuration>
+							<url>${database.url}</url>
+							<user>${database.username}</user>
+							<password>${database.password}</password>
+							<locations>
+								<location>
+									filesystem:src/main/resources/db/migration
+								</location>
+							</locations>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Runs the jOOQ code generation.-->
+			<plugin>
+				<groupId>org.jooq</groupId>
+				<artifactId>jooq-codegen-maven</artifactId>
+				<version>3.18.9</version>
+				<executions>
+					<execution>
+						<id>jooq-codegen</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<jdbc>
+						<url>${database.url}</url>
+						<user>${database.username}</user>
+						<password>${database.password}</password>
+					</jdbc>
+					<generator>
+						<database>
+							<name>org.jooq.meta.postgres.PostgresDatabase</name>
+							<includes>todo_item|tag</includes>
+							<inputSchema>public</inputSchema>
+						</database>
+						<generate>
+							<deprecated>false</deprecated>
+							<records>false</records>
+							<pojos>false</pojos>
+						</generate>
+						<target>
+							<packageName>net.petrikainulainen.springmvctest.junit5.jooq</packageName>
+						</target>
+					</generator>
+				</configuration>
+
+				<dependencies>
+					<dependency>
+						<groupId>org.postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+						<version>${postgresql.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<!-- Runs unit tests. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version>
+				<configuration>
+					<groups>unitTest</groups>
+					<skipTests>${skip.unit.tests}</skipTests>
+				</configuration>
+			</plugin>
+			<!-- Runs integration tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>3.2.5</version>
+				<configuration>
+					<includes>
+						<include>**/*.java</include>
+					</includes>
+					<groups>integrationTest</groups>
+				</configuration>
+				<executions>
+					<execution>
+						<id>integration-tests</id>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+						<configuration>
+							<skipTests>${skip.integration.tests}</skipTests>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

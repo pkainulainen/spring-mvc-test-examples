@@ -1,0 +1,2 @@
+DELETE FROM tag;
+DELETE FROM todo_item;
