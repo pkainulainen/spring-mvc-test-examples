@@ -33,13 +33,10 @@
 
 	<profiles>
 		<profile>
-			<id>application</id>
+			<id>unit-tests</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
-		</profile>
-		<profile>
-			<id>unit-tests</id>
 			<properties>
 				<skip.unit.tests>false</skip.unit.tests>
 			</properties>
