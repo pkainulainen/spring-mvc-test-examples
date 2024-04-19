@@ -1,0 +1,8 @@
+logging:
+  level:
+    root: ERROR
+spring:
+  datasource:
+    url: should_be_overridden
+    username: should_be_overridden
+    password: should_be_overridden

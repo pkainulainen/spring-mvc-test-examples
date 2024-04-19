@@ -1,0 +1,8 @@
+logging:
+  level:
+    root: DEBUG
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16.1:///springmvctest
+    username: springmvctest
+    password: springmvctest
