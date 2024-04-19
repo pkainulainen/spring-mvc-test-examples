@@ -3,6 +3,6 @@ logging:
     root: ERROR
 spring:
   datasource:
-    url: should_be_overridden
-    username: should_be_overridden
-    password: should_be_overridden
+    url: should_be_overwritten
+    username: should_be_overwritten
+    password: should_be_overwritten
