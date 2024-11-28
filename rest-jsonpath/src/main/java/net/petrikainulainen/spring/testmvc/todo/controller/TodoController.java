@@ -150,22 +150,7 @@ public class TodoController {
         FormValidationErrorDTO dto = new FormValidationErrorDTO();
 
         for (FieldError fieldError: fieldErrors) {
-            String[] fieldErrorCodes = fieldError.getCodes();
-            for (int index = 0; index < fieldErrorCodes.length; index++) {
-                String fieldErrorCode = fieldErrorCodes[index];
-
-                String localizedError = messageSource.getMessage(fieldErrorCode, fieldError.getArguments(), current);
-                if (localizedError != null && !localizedError.equals(fieldErrorCode)) {
-                    LOGGER.debug("Adding error message: {} to field: {}", localizedError, fieldError.getField());
-                    dto.addFieldError(fieldError.getField(), localizedError);
-                    break;
-                }
-                else {
-                    if (isLastFieldErrorCode(index, fieldErrorCodes)) {
-                        dto.addFieldError(fieldError.getField(), localizedError);
-                    }
-                }
-            }
+            dto.addFieldError(fieldError.getField(), messageSource.getMessage(fieldError, current));
         }
 
         return dto;
