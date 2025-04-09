@@ -13,7 +13,7 @@ import java.util.Map;
  * Creates and sends the HTTP requests which are used to write unit tests
  * for controllers methods which provide CRUD operations for todo items.
  */
-class TodoItemRequestBuilder {
+class TodoItemHttpRequestBuilder {
 
     static final String TEMPLATE_VARIABLE_DESCRIPTION = "description";
     static final String TEMPLATE_VARIABLE_TITLE = "title";
@@ -22,7 +22,7 @@ class TodoItemRequestBuilder {
     private final MockMvcTester mockMvc;
     private final TemplateEngine templateEngine;
 
-    TodoItemRequestBuilder(MockMvc mockMvc) {
+    TodoItemHttpRequestBuilder(MockMvc mockMvc) {
         this.mockMvc = MockMvcTester.create(mockMvc);
         this.templateEngine = new TemplateEngine();
     }

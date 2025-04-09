@@ -7,7 +7,7 @@ import net.petrikainulainen.springmvctest.junit5.todo.TodoItemDTO;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemNotFoundException;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoItemStatus;
 import net.petrikainulainen.springmvctest.junit5.todo.TodoListItemDTO;
-import net.petrikainulainen.springmvctest.junit5.web.TodoItemRequestBuilder.RequestBodyTemplate;
+import net.petrikainulainen.springmvctest.junit5.web.TodoItemHttpRequestBuilder.RequestBodyTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import static info.solidsoft.mockito.java8.AssertionMatcher.assertArg;
-import static net.petrikainulainen.springmvctest.junit5.web.TodoItemRequestBuilder.*;
+import static net.petrikainulainen.springmvctest.junit5.web.TodoItemHttpRequestBuilder.*;
 import static net.petrikainulainen.springmvctest.junit5.web.WebTestConfig.objectMapperHttpMessageConverter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.verify;
 
 class TodoItemCrudControllerTest {
 
-    private TodoItemRequestBuilder requestBuilder;
+    private TodoItemHttpRequestBuilder requestBuilder;
     private TodoItemCrudService service;
 
     @BeforeEach
@@ -47,7 +47,7 @@ class TodoItemCrudControllerTest {
                 .setControllerAdvice(new TodoItemErrorHandler())
                 .setMessageConverters(objectMapperHttpMessageConverter())
                 .build();
-        requestBuilder = new TodoItemRequestBuilder(mockMvc);
+        requestBuilder = new TodoItemHttpRequestBuilder(mockMvc);
     }
 
     @Nested
