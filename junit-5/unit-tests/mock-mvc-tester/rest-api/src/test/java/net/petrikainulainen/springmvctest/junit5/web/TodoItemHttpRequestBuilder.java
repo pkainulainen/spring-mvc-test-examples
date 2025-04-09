@@ -19,11 +19,11 @@ class TodoItemHttpRequestBuilder {
     static final String TEMPLATE_VARIABLE_TITLE = "title";
     static final String TEMPLATE_VARIABLE_UNKNOWN  = "unknown";
 
-    private final MockMvcTester mockMvc;
+    private final MockMvcTester mockMvcTester;
     private final TemplateEngine templateEngine;
 
     TodoItemHttpRequestBuilder(MockMvc mockMvc) {
-        this.mockMvc = MockMvcTester.create(mockMvc);
+        this.mockMvcTester = MockMvcTester.create(mockMvc);
         this.templateEngine = new TemplateEngine();
     }
 
@@ -40,7 +40,7 @@ class TodoItemHttpRequestBuilder {
      */
     MvcTestResult create(RequestBodyTemplate requestBodyTemplate, Map<String, Object> templateVariables) {
         var requestBody = buildRequestBody(requestBodyTemplate, templateVariables);
-        return mockMvc.post()
+        return mockMvcTester.post()
                 .uri("/todo-item")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody)
@@ -65,7 +65,7 @@ class TodoItemHttpRequestBuilder {
      *          returned response with AssertJ.
      */
     MvcTestResult findAll() {
-        return mockMvc.get()
+        return mockMvcTester.get()
                 .uri("/todo-item")
                 .exchange();
     }
@@ -79,7 +79,7 @@ class TodoItemHttpRequestBuilder {
      *          returned response with AssertJ.
      */
     MvcTestResult findById(Long id) {
-        return mockMvc.get()
+        return mockMvcTester.get()
                 .uri("/todo-item/{id}", id)
                 .exchange();
     }
