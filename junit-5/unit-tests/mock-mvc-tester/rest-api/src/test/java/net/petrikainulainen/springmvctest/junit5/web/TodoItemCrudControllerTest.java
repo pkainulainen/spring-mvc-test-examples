@@ -431,18 +431,6 @@ class TodoItemCrudControllerTest {
     @DisplayName("Find all todo items")
     class FindAll {
 
-        @Test
-        @DisplayName("Should return the HTTP status code OK (200)")
-        void shouldReturnHttpStatusCodeOk() {
-            assertThat(requestBuilder.findAll()).hasStatusOk();
-        }
-
-        @Test
-        @DisplayName("Should return the found todo items as JSON")
-        void shouldReturnFoundTodoItemAsJSON() {
-            assertThat(requestBuilder.findAll()).hasContentType(MediaType.APPLICATION_JSON);
-        }
-
         @Nested
         @DisplayName("When no todo items are found")
         class WhenNoTodoItemsAreFound {
@@ -450,6 +438,18 @@ class TodoItemCrudControllerTest {
             @BeforeEach
             void returnEmptyList() {
                 given(service.findAll()).willReturn(new ArrayList<>());
+            }
+
+            @Test
+            @DisplayName("Should return the HTTP status code OK (200)")
+            void shouldReturnHttpStatusCodeOk() {
+                assertThat(requestBuilder.findAll()).hasStatusOk();
+            }
+
+            @Test
+            @DisplayName("Should return the found todo items as JSON")
+            void shouldReturnFoundTodoItemAsJSON() {
+                assertThat(requestBuilder.findAll()).hasContentType(MediaType.APPLICATION_JSON);
             }
 
             @Test
@@ -502,6 +502,18 @@ class TodoItemCrudControllerTest {
                 second.setTitle(SECOND_TODO_ITEM_TITLE);
 
                 given(service.findAll()).willReturn(Arrays.asList(first, second));
+            }
+
+            @Test
+            @DisplayName("Should return the HTTP status code OK (200)")
+            void shouldReturnHttpStatusCodeOk() {
+                assertThat(requestBuilder.findAll()).hasStatusOk();
+            }
+
+            @Test
+            @DisplayName("Should return the found todo items as JSON")
+            void shouldReturnFoundTodoItemAsJSON() {
+                assertThat(requestBuilder.findAll()).hasContentType(MediaType.APPLICATION_JSON);
             }
 
             @Test
