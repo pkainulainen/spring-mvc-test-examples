@@ -54,8 +54,8 @@ class TodoItemCrudControllerTest {
     @DisplayName("Create a new todo item")
     class Create {
 
-        private static final int MAX_LENGTH_DESCRIPTION = 1000;
-        private static final int MAX_LENGTH_TITLE = 100;
+        private final int MAX_LENGTH_DESCRIPTION = 1000;
+        private final int MAX_LENGTH_TITLE = 100;
 
         private CreateTodoItemDTO input;
 
@@ -63,9 +63,9 @@ class TodoItemCrudControllerTest {
         @DisplayName("When the information of the created todo item isn't valid")
         class WhenInvalidInformationIsProvided {
 
-            private static final String VALIDATION_ERROR_CODE_EMPTY_VALUE = "NotBlank";
-            private static final String VALIDATION_ERROR_CODE_MISSING_VALUE = "NotBlank";
-            private static final String VALIDATION_ERROR_CODE_TOO_LONG_VALUE = "Size";
+            private final String VALIDATION_ERROR_CODE_EMPTY_VALUE = "NotBlank";
+            private final String VALIDATION_ERROR_CODE_MISSING_VALUE = "NotBlank";
+            private final String VALIDATION_ERROR_CODE_TOO_LONG_VALUE = "Size";
 
             @Nested
             @DisplayName("When the field values are missing")
@@ -364,7 +364,7 @@ class TodoItemCrudControllerTest {
             @DisplayName("When the created todo item has an unknown property")
             class WhenCreatedTodoItemHasUnknownProperty {
 
-                private static final String UNKNOWN_VALUE = "unknownValue";
+                private final String UNKNOWN_VALUE = "unknownValue";
 
                 private final Map<String, Object> TEMPLATE_VARIABLES = Map.of(
                         TEMPLATE_VARIABLE_DESCRIPTION, DESCRIPTION,
@@ -466,15 +466,15 @@ class TodoItemCrudControllerTest {
         @DisplayName("When two todo items are found")
         class WhenTwoTodoItemsAreFound {
 
-            private static final Long FIRST_TODO_ITEM_ID = 1L;
-            private static final TodoItemStatus FIRST_TODO_ITEM_STATUS = TodoItemStatus.DONE;
-            private static final String FIRST_TODO_ITEM_TITLE = "Write example application";
+            private final Long FIRST_TODO_ITEM_ID = 1L;
+            private final TodoItemStatus FIRST_TODO_ITEM_STATUS = TodoItemStatus.DONE;
+            private final String FIRST_TODO_ITEM_TITLE = "Write example application";
 
-            private static final Long SECOND_TODO_ITEM_ID = 2L;
-            private static final TodoItemStatus SECOND_TODO_ITEM_STATUS = TodoItemStatus.IN_PROGRESS;
-            private static final String SECOND_TODO_ITEM_TITLE = "Write blog post";
+            private final Long SECOND_TODO_ITEM_ID = 2L;
+            private final TodoItemStatus SECOND_TODO_ITEM_STATUS = TodoItemStatus.IN_PROGRESS;
+            private final String SECOND_TODO_ITEM_TITLE = "Write blog post";
 
-            private static final String EXPECTED_BODY_JSON = """
+            private final String EXPECTED_BODY_JSON = """
                     [
                         {
                             "id": 1,
@@ -539,7 +539,7 @@ class TodoItemCrudControllerTest {
     @DisplayName("Find todo item by using its id as search criteria")
     class FindById {
 
-        private static final Long TODO_ITEM_ID = 1L;
+        private final Long TODO_ITEM_ID = 1L;
 
         @Nested
         @DisplayName("When the requested todo item isn't found")
@@ -567,8 +567,8 @@ class TodoItemCrudControllerTest {
         @DisplayName("When the requested todo item is found")
         class WhenRequestedTodoItemIsFound {
 
-            private static final String DESCRIPTION = "Remember to use JUnit 5";
-            private static final String EXPECTED_BODY_JSON = """
+            private final String DESCRIPTION = "Remember to use JUnit 5";
+            private final String EXPECTED_BODY_JSON = """
                     {
                         "id": 1,
                         "description": "Remember to use JUnit 5",
@@ -582,10 +582,10 @@ class TodoItemCrudControllerTest {
                         "status": "IN_PROGRESS"
                     }
                     """;
-            private static final Long TAG_ID = 9L;
-            private static final String TAG_NAME  = "Code";
-            private static final String TITLE = "Write example application";
-            private static final TodoItemStatus STATUS = TodoItemStatus.IN_PROGRESS;
+            private final Long TAG_ID = 9L;
+            private final String TAG_NAME  = "Code";
+            private final String TITLE = "Write example application";
+            private final TodoItemStatus STATUS = TodoItemStatus.IN_PROGRESS;
 
             @BeforeEach
             void returnFoundTodoItem() {
