@@ -432,8 +432,8 @@ class TodoItemCrudControllerTest {
     class FindAll {
 
         @Nested
-        @DisplayName("When no todo items are found")
-        class WhenNoTodoItemsAreFound {
+        @DisplayName("When no todo items is found")
+        class WhenNoTodoItemsIsFound {
 
             @BeforeEach
             void returnEmptyList() {
