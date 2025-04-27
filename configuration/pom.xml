@@ -23,7 +23,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.6.4</slf4j.version>
-        <spring.version>3.1.2.RELEASE</spring.version>
+        <spring.version>5.2.22.RELEASE</spring.version>
         <build.profile.id>dev</build.profile.id>
         <skip.integration.tests>true</skip.integration.tests>
         <skip.unit.tests>false</skip.unit.tests>
