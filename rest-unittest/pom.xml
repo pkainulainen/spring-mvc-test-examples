@@ -28,7 +28,7 @@
         <jsonpath.version>0.8.1</jsonpath.version>
         <slf4j.version>1.6.4</slf4j.version>
         <spring.version>3.2.3.RELEASE</spring.version>
-        <spring.data.version>1.3.2.RELEASE</spring.data.version>
+        <spring.data.version>1.11.23.RELEASE</spring.data.version>
 
         <build.profile.id>dev</build.profile.id>
         <jdk.version>1.7</jdk.version>
