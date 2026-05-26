@@ -18,22 +18,18 @@ public final class WebTestConfig {
 
     /**
      * Creates a new {@code HttpMessageConverter} object that can read and
-     * write JSON documents by using Jackson's {@code ObjectMapper}.
-     *
-     * @return
+     * write JSON documents by using Jackson's {@link JsonMapper}.
      */
     public static JacksonJsonHttpMessageConverter objectMapperHttpMessageConverter() {
         return new JacksonJsonHttpMessageConverter(jsonMapper());
     }
 
     /**
-     * Creates a new {@code JsonMapper} object. This method is public
+     * Creates a new {@link JsonMapper} object. This method is public
      * because our request builder classes will invoke this method when
      * they have to send JSON documents to our REST API. THis ensures
      * that our request builder classes and the Spring MVC Test framework
-     * use the same {@code ObjectMapper} configuration.
-     *
-     * @return
+     * use the same {@link JsonMapper} configuration.
      */
     public static JsonMapper jsonMapper() {
         return new JsonMapper();

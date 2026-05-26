@@ -29,8 +29,8 @@ class TodoItemRequestBuilder {
      * todo item form.
      *
      * @param input    The information of the created todo item
-     * @return
-     * @throws Exception
+     * @return  A {@link ResultActions} object that allows us to write assertions for the HTTP response.
+     * @throws Exception    if an error occurs.
      */
     ResultActions create(CreateTodoItemDTO input) throws Exception {
         return mockMvc.perform(post("/todo-item")
@@ -47,8 +47,8 @@ class TodoItemRequestBuilder {
     /**
      * Creates and sends the HTTP requests which gets the
      * HTML document that displays the information of all todo items.
-     * @return
-     * @throws Exception
+     * @return  A {@link ResultActions} object that allows us to write assertions for the HTTP response.
+     * @throws Exception    if an error occurs.
      */
     ResultActions findAll() throws Exception {
         return mockMvc.perform(get("/todo-item"));
@@ -59,8 +59,8 @@ class TodoItemRequestBuilder {
      * HTML document that displays the information of the
      * requested todo item.
      * @param id    The id of the requested todo item.
-     * @return
-     * @throws Exception
+     * @return  A {@link ResultActions} object that allows us to write assertions for the HTTP response.
+     * @throws Exception    if an error occurs.
      */
     ResultActions findById(Long id) throws Exception {
         return mockMvc.perform(get("/todo-item/{id}", id));
