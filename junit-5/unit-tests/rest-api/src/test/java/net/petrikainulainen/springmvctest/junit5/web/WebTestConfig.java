@@ -1,7 +1,7 @@
 package net.petrikainulainen.springmvctest.junit5.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * This class provides static factory methods which are used
@@ -22,14 +22,12 @@ public final class WebTestConfig {
      *
      * @return
      */
-    public static MappingJackson2HttpMessageConverter objectMapperHttpMessageConverter() {
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(objectMapper());
-        return converter;
+    public static JacksonJsonHttpMessageConverter objectMapperHttpMessageConverter() {
+        return new JacksonJsonHttpMessageConverter(jsonMapper());
     }
 
     /**
-     * Creates a new {@code ObjectMapper} object. This method is public
+     * Creates a new {@code JsonMapper} object. This method is public
      * because our request builder classes will invoke this method when
      * they have to send JSON documents to our REST API. THis ensures
      * that our request builder classes and the Spring MVC Test framework
@@ -37,8 +35,8 @@ public final class WebTestConfig {
      *
      * @return
      */
-    public static ObjectMapper objectMapper() {
-        return new ObjectMapper();
+    public static JsonMapper jsonMapper() {
+        return new JsonMapper();
     }
 }
 

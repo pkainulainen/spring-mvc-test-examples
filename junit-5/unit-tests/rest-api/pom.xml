@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.petrikainulainen.springmvctest.junit5.unit</groupId>
     <artifactId>rest-api</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <name>Writing Unit Tests for a Spring MVC REST API</name>
     <description>
         This example demonstrates how you can write unit tests for
@@ -12,16 +12,14 @@
     </description>
 
     <properties>
-        <junit-jupiter.version>5.9.3</junit-jupiter.version>
-
-        <jdk.version>17</jdk.version>
+        <jdk.version>25</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.1</version>
+        <version>4.0.6</version>
     </parent>
 
     <dependencies>
@@ -56,12 +54,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>info.solidsoft.mockito</groupId>
-            <artifactId>mockito-java8</artifactId>
-            <version>2.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -73,7 +65,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.15.0</version>
                 <configuration>
                     <source>${jdk.version}</source>
                     <target>${jdk.version}</target>
@@ -83,7 +75,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.5.5</version>
             </plugin>
         </plugins>
     </build>

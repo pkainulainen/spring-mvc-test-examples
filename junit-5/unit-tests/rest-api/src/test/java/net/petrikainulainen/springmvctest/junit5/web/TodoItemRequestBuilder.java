@@ -1,6 +1,5 @@
 package net.petrikainulainen.springmvctest.junit5.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.petrikainulainen.springmvctest.junit5.todo.CreateTodoItemDTO;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -8,7 +7,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.io.IOException;
 
-import static net.petrikainulainen.springmvctest.junit5.web.WebTestConfig.objectMapper;
+import static net.petrikainulainen.springmvctest.junit5.web.WebTestConfig.jsonMapper;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -41,7 +40,7 @@ class TodoItemRequestBuilder {
     }
 
     private static byte[] convertObjectToJsonBytes(Object object) throws IOException {
-        ObjectMapper mapper = objectMapper();
+        var mapper = jsonMapper();
         return mapper.writeValueAsBytes(object);
     }
 
