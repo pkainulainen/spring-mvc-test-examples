@@ -31,7 +31,7 @@ public final class WebTestConfig {
      * that our request builder classes and the Spring MVC Test framework
      * use the same {@link JsonMapper} configuration.
      */
-    public static JsonMapper jsonMapper() {
+   private static JsonMapper jsonMapper() {
         return new JsonMapper();
     }
 }

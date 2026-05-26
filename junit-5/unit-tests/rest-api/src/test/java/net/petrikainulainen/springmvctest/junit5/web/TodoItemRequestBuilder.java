@@ -12,8 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
- * Creates and sends the HTTP requests which are used
- * to write unit tests for controllers methods which
+ * Creates and sends the HTTP requests which are used to write unit tests for controllers methods which
  * provide CRUD operations for todo items.
  */
 class TodoItemRequestBuilder {
@@ -93,7 +92,7 @@ class TodoItemRequestBuilder {
 
         private final String template;
 
-        private CreateRequestBodyTemplate(String template) {
+        CreateRequestBodyTemplate(String template) {
             this.template = template;
         }
 
