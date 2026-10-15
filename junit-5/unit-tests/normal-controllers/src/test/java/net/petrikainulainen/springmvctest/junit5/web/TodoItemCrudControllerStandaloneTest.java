@@ -7,13 +7,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.support.StaticMessageSource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static net.petrikainulainen.springmvctest.junit5.web.WebTestConfig.*;
+import static net.petrikainulainen.springmvctest.junit5.web.MockMvcConfig.mockMvcForController;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
@@ -42,11 +41,7 @@ class TodoItemCrudControllerStandaloneTest {
     void configureSystemUnderTest() {
         service = mock(TodoItemCrudService.class);
 
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new TodoItemCrudController(messageSource, service))
-                .setHandlerExceptionResolvers(exceptionResolver())
-                .setLocaleResolver(fixedLocaleResolver())
-                .setViewResolvers(jspViewResolver())
-                .build();
+        MockMvc mockMvc = mockMvcForController(new TodoItemCrudController(messageSource, service));
         requestBuilder = new TodoItemRequestBuilder(mockMvc);
     }
 
