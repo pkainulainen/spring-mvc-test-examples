@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class TodoItemCrudControllerStandaloneTest {
 
-    private StaticMessageSource messageSource = new StaticMessageSource();
+    private final StaticMessageSource messageSource = new StaticMessageSource();
     private TodoItemRequestBuilder requestBuilder;
     private TodoItemCrudService service;
 
