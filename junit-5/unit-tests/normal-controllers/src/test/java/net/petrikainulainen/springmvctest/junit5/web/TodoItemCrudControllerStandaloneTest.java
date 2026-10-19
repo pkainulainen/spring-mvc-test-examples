@@ -41,7 +41,7 @@ class TodoItemCrudControllerStandaloneTest {
     void configureSystemUnderTest() {
         service = mock(TodoItemCrudService.class);
 
-        MockMvc mockMvc = mockMvcForController(new TodoItemCrudController(messageSource, service));
+        var mockMvc = mockMvcForController(new TodoItemCrudController(messageSource, service));
         requestBuilder = new TodoItemRequestBuilder(mockMvc);
     }
 
